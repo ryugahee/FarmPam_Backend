@@ -14,7 +14,7 @@ public class FCMRepository {
 
     public void saveToken(Member member){
         tokenRedisTemplate.opsForValue()
-                .set(member.getEmail(), member.getAuthorities());
+                .set(member.getEmail()," member.getAuthorities()");
 
     }
 }
