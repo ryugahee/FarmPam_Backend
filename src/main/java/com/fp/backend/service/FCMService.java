@@ -1,19 +1,19 @@
-package com.fp.backend.service;
-
-import com.fp.backend.dto.FCMRequestDto;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
-@RequiredArgsConstructor
-@Service
-public class FCMService {
-
+//package com.fp.backend.service;
+//
+//import com.fp.backend.dto.FCMRequestDto;
+//import com.google.firebase.messaging.FirebaseMessaging;
+//import com.google.firebase.messaging.FirebaseMessagingException;
+//import com.google.firebase.messaging.Message;
+//import com.google.firebase.messaging.Notification;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.stereotype.Service;
+//
+//import java.util.Optional;
+//
+//@RequiredArgsConstructor
+//@Service
+//public class FCMService {
+//
 //
 //    private final FirebaseMessaging firebaseMessaging;
 //    private final UsersRepository usersRepository; // 유저 레포 가져오기
@@ -48,5 +48,5 @@ public class FCMService {
 //            return"해당유저 존재하지 않음"+requestDto.getTargetUserId();
 //        }
 //    }
-
-}
+//
+//}
