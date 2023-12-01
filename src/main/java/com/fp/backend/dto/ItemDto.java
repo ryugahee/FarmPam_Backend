@@ -3,8 +3,6 @@ package com.fp.backend.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 public class ItemDto {
@@ -22,6 +20,6 @@ public class ItemDto {
 
     private int weight;
 
-    private boolean isSoldout;
+    private Boolean isSoldout;
 
 }
