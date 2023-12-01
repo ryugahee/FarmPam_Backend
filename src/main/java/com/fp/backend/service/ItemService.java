@@ -2,14 +2,17 @@ package com.fp.backend.service;
 
 
 import com.fp.backend.dto.ItemFormDto;
+import com.fp.backend.dto.ItemImgDto;
 import com.fp.backend.entity.Item;
 import com.fp.backend.entity.ItemImg;
+import com.fp.backend.repository.ItemImgRepository;
 import com.fp.backend.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,6 +21,7 @@ import java.util.List;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final ItemImgRepository itemImgRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
 
@@ -44,6 +48,50 @@ public class ItemService {
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
 
         return item.getId();
+    }
+
+/*    @Transactional(readOnly = true)
+    public ItemFormDto getItemList() {
+        List<ItemImg> itemImgList = itemImgRepository.findAll();
+
+        List<ItemImgDto> itemImgDtoList = new ArrayList<>();
+        for (ItemImg itemImg : itemImgList) {
+            ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
+            itemImgDtoList.add(itemImgDto);
+        }
+
+        List<Item> itemList = itemRepository.findAll();
+
+        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+        for (Item item : itemList){
+            ItemFormDto itemFormDto = ItemFormDto.of(item);
+            itemFormDto.setItemImgDtoList(itemImgDtoList);
+            itemFormDtoList.add(itemFormDto);
+        }
+        return itemFormDto;
+    }*/
+    @Transactional(readOnly = true)
+    public List<ItemFormDto> getItemList() {
+        List<Item> itemList = itemRepository.findAll();
+
+        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+        for (Item item : itemList) {
+            ItemFormDto itemFormDto = ItemFormDto.of(item);
+
+            // 상품 이미지 정보 가져오기
+            List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
+            List<ItemImgDto> itemImgDtoList = new ArrayList<>();
+            for (ItemImg itemImg : itemImgList) {
+                ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
+                itemImgDtoList.add(itemImgDto);
+
+                System.out.println("대표이미지: " + itemImgList);
+            }
+            itemFormDto.setItemImgDtoList(itemImgDtoList);
+
+            itemFormDtoList.add(itemFormDto);
+        }
+        return itemFormDtoList;
     }
 
 }

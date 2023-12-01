@@ -21,7 +21,7 @@ public class ItemImgService {
 
     public String makeDir() {
 
-        String folderPath = "C:\\auction\\item";
+        String folderPath = "C:\\auction\\imges\\item";
 
         File makeFolder = new File(folderPath);
 
