@@ -1,4 +1,4 @@
-package com.fp.backend.jwt;
+package com.fp.backend.system.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

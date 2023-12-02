@@ -4,7 +4,7 @@ import com.fp.backend.dto.LoginDto;
 import com.fp.backend.dto.SignupDto;
 import com.fp.backend.dto.TokenDto;
 import com.fp.backend.entity.Member;
-import com.fp.backend.jwt.TokenProvider;
+import com.fp.backend.system.jwt.TokenProvider;
 import com.fp.backend.service.UserService;
 import com.fp.backend.system.util.UUIDProvider;
 import jakarta.servlet.http.Cookie;
