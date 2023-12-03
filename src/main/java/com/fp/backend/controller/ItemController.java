@@ -4,6 +4,8 @@ import com.fp.backend.dto.ItemFormDto;
 import com.fp.backend.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,5 +43,11 @@ public class ItemController {
         return itemService.getItemList();
     }
 
+/*    @GetMapping("/item/list")
+    public List<ItemFormDto> getItemList(@RequestParam int lastId,
+                                         @RequestParam int size) {
+        System.out.println("아이템 요청");
+        return itemService.getItemList(lastId, size);
+    }*/
 
 }

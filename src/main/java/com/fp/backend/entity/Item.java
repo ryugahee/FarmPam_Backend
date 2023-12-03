@@ -29,7 +29,7 @@ public class Item extends BaseEntity{
     private String itemDetail;
 
     @Column(nullable = false)
-    private int time;
+    private long time;
 
     @Column(nullable = false)
     private String itemType;
@@ -38,6 +38,6 @@ public class Item extends BaseEntity{
     private int weight;
 
     @Column
-    private boolean isSoldout;
+    private Boolean isSoldout;
 
 }

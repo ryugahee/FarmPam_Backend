@@ -8,12 +8,17 @@ import com.fp.backend.entity.ItemImg;
 import com.fp.backend.repository.ItemImgRepository;
 import com.fp.backend.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.currentTimeMillis;
 
 @Service
 @Transactional
@@ -31,6 +36,12 @@ public class ItemService {
 
         // 상품 등록
         Item item = itemFormDto.createItem();
+        // 경매 마감 시간 저장
+        long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
+        item.setTime(updatedTime);
+
+        item.setIsSoldout(false);
+
         itemRepository.save(item);
 
         // 이미지 등록
@@ -53,13 +64,14 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList() {
-        List<Item> itemList = itemRepository.findAll();
+        List<Item> itemList = itemRepository.findByIsSoldout(false);
+//        PageRequest pageRequest = PageRequest.of(0, size);
+//        List<Item> itemList = itemRepository.findByIsSoldoutOrderByIdDesc(false, lastId, pageRequest );
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
             ItemFormDto itemFormDto = ItemFormDto.of(item);
 
-            // 상품 이미지 정보 가져오기
             List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
             List<ItemImgDto> itemImgDtoList = new ArrayList<>();
             for (ItemImg itemImg : itemImgList) {

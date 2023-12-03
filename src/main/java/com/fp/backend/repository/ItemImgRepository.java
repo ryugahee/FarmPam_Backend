@@ -8,7 +8,6 @@ import java.util.List;
 
 
 public interface ItemImgRepository extends JpaRepository<ItemImg, Long> {
-    List<ItemImg> findByItem(Item item);
 
     List<ItemImg> findByItemAndRepImgYn(Item item, String repImgYn);
 

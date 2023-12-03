@@ -20,13 +20,13 @@ public class ItemFormDto {
 
     private String itemDetail;
 
-    private int time;
+    private long time;
 
     private String itemType;
 
     private int weight;
 
-    private boolean isSoldout;
+    private Boolean isSoldout;
 
     // 상품 저장 후 수정할 때 상품 이미지 정보 저장 리스트
     private List<ItemImgDto> itemImgDtoList = new ArrayList<>();
@@ -43,6 +43,24 @@ public class ItemFormDto {
         return modelMapper.map(this, Item.class);
     }
     public static ItemFormDto of(Item item) {
-        return modelMapper.map(item, ItemFormDto.class);
+        ItemFormDto itemFormDto = modelMapper.map(item, ItemFormDto.class);
+
+        // 남은 경매 시간
+        long currentTimeMillis = System.currentTimeMillis();
+        long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
+/*        itemFormDto.setTime(elapsedTimeInMillis);
+        System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);*/
+        if (elapsedTimeInMillis > 0) {
+            itemFormDto.setTime(elapsedTimeInMillis);
+            System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
+        } else {
+            itemFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+        }
+
+
+        return itemFormDto;
+
+
+//        return modelMapper.map(item, ItemFormDto.class);
     }
 }
