@@ -1,9 +1,9 @@
 package com.fp.backend.security.config;
 
-import com.fp.backend.jwt.JwtAccessDeniedHandler;
-import com.fp.backend.jwt.JwtAuthenticationEntryPoint;
-import com.fp.backend.jwt.JwtSecurityConfig;
-import com.fp.backend.jwt.TokenProvider;
+import com.fp.backend.system.jwt.JwtAccessDeniedHandler;
+import com.fp.backend.system.jwt.JwtAuthenticationEntryPoint;
+import com.fp.backend.system.jwt.JwtSecurityConfig;
+import com.fp.backend.system.jwt.TokenProvider;
 import com.fp.backend.service.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
