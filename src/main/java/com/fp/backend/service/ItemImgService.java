@@ -2,6 +2,7 @@ package com.fp.backend.service;
 
 import com.fp.backend.entity.ItemImg;
 import com.fp.backend.repository.ItemImgRepository;
+import com.google.api.client.util.Value;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class ItemImgService {
     private final ItemImgRepository itemImgRepository;
 
     private final FileService fileService;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     public String makeDir() {
 
@@ -51,5 +55,4 @@ public class ItemImgService {
         itemImg.updateItemImg(oriImgName, imgName, imgUrl);
         itemImgRepository.save(itemImg);
     }
-
 }
