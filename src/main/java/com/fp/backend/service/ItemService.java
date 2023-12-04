@@ -63,10 +63,16 @@ public class ItemService {
 
 
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList() {
-        List<Item> itemList = itemRepository.findByIsSoldout(false);
-//        PageRequest pageRequest = PageRequest.of(0, size);
+    public List<ItemFormDto> getItemList(int lastId, int size) {
+//        List<Item> itemList = itemRepository.findByIsSoldout(false);
 //        List<Item> itemList = itemRepository.findByIsSoldoutOrderByIdDesc(false, lastId, pageRequest );
+        PageRequest pageRequest = PageRequest.of(0, size);
+        Slice<Item> itemList;
+        if (lastId == 0) {
+            itemList = itemRepository.findFirstPage(lastId, size);
+        } else {
+           itemList = itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, lastId, pageRequest);
+        }
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {

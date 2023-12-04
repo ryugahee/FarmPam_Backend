@@ -37,17 +37,17 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/item/list")
+/*    @GetMapping("/item/list")
     public List<ItemFormDto> getItemList() {
         System.out.println("아이템 요청");
         return itemService.getItemList();
-    }
+    }*/
 
-/*    @GetMapping("/item/list")
+    @GetMapping("/item/list")
     public List<ItemFormDto> getItemList(@RequestParam int lastId,
                                          @RequestParam int size) {
         System.out.println("아이템 요청");
         return itemService.getItemList(lastId, size);
-    }*/
+    }
 
 }
