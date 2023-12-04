@@ -43,11 +43,18 @@ public class ItemController {
         return itemService.getItemList();
     }*/
 
-    @GetMapping("/item/list")
-    public List<ItemFormDto> getItemList(@RequestParam int lastId,
+/*    @GetMapping("/item/list")
+    public List<ItemFormDto> getItemList(@RequestParam Long cursorId,
+                                         @RequestParam int size) {
+        System.out.println("아이템 요청: " + cursorId);
+        return itemService.getItemList(cursorId, PageRequest.of(0, size));
+    }*/
+
+        @GetMapping("/item/list")
+    public List<ItemFormDto> getItemList(@RequestParam int page,
                                          @RequestParam int size) {
         System.out.println("아이템 요청");
-        return itemService.getItemList(lastId, size);
+        return itemService.getItemList(page, size);
     }
 
 }

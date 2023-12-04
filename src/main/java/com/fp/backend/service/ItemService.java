@@ -1,6 +1,7 @@
 package com.fp.backend.service;
 
 
+import com.fp.backend.controller.CursorResult;
 import com.fp.backend.dto.ItemFormDto;
 import com.fp.backend.dto.ItemImgDto;
 import com.fp.backend.entity.Item;
@@ -61,18 +62,26 @@ public class ItemService {
         return item.getId();
     }
 
-
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(int lastId, int size) {
+    public List<ItemFormDto> getItemList(int page, int size) {
 //        List<Item> itemList = itemRepository.findByIsSoldout(false);
 //        List<Item> itemList = itemRepository.findByIsSoldoutOrderByIdDesc(false, lastId, pageRequest );
-        PageRequest pageRequest = PageRequest.of(0, size);
+/*
         Slice<Item> itemList;
         if (lastId == 0) {
             itemList = itemRepository.findFirstPage(lastId, size);
         } else {
            itemList = itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, lastId, pageRequest);
         }
+*/
+/*        // cursor
+        List<Item> itemList = (cursorId == 0) ?
+                this.itemRepository.findByIsSoldoutOrderByIdDesc(false, cursorId, page) :
+                this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, cursorId, page);*/
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        List<Item> itemList = this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, pageRequest);
+
+
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {

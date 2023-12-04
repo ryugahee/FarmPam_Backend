@@ -17,4 +17,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
  /*   Slice<Item> findByIdLessThanOrderByIdDesc(Boolean isSoldout, int lastId, PageRequest pageRequest);
     Slice<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout, int lastId, PageRequest pageRequest);
 */
+
+//    List<Item> findByIsSoldoutOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
+
+    List<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout,  PageRequest pageRequest);
+
+//    boolean existsByIdLessThan(Long id);
+
+
+
 }
