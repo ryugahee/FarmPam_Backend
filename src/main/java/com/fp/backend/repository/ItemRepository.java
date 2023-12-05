@@ -1,6 +1,9 @@
 package com.fp.backend.repository;
 
 import com.fp.backend.entity.Item;
+import com.google.gson.stream.JsonToken;
+import net.minidev.json.JSONUtil;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,12 +21,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Slice<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout, int lastId, PageRequest pageRequest);
 */
 
-//    List<Item> findByIsSoldoutOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
+    Slice<Item> findByIsSoldoutAndIdOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
 
-    List<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout,  PageRequest pageRequest);
-
-//    boolean existsByIdLessThan(Long id);
-
+    Slice<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
 
 
 }

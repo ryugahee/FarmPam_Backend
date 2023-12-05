@@ -4,8 +4,10 @@ import com.fp.backend.dto.ItemFormDto;
 import com.fp.backend.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,18 +45,24 @@ public class ItemController {
         return itemService.getItemList();
     }*/
 
-/*    @GetMapping("/item/list")
-    public List<ItemFormDto> getItemList(@RequestParam Long cursorId,
-                                         @RequestParam int size) {
+    @GetMapping("/item/list")
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam Long cursorId,
+                                          int size) {
         System.out.println("아이템 요청: " + cursorId);
-        return itemService.getItemList(cursorId, PageRequest.of(0, size));
-    }*/
+        System.out.println("아이템 요청: " + size);
 
-        @GetMapping("/item/list")
+        Pageable page = PageRequest.of(0, size);
+
+        List<ItemFormDto> itemList = itemService.getItemList(cursorId, page);
+        System.out.println("itemList = " + itemList);
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
+
+/*        @GetMapping("/item/list")
     public List<ItemFormDto> getItemList(@RequestParam int page,
                                          @RequestParam int size) {
         System.out.println("아이템 요청");
         return itemService.getItemList(page, size);
-    }
+    }*/
 
 }

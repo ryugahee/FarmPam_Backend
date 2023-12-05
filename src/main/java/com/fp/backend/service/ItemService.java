@@ -9,9 +9,7 @@ import com.fp.backend.entity.ItemImg;
 import com.fp.backend.repository.ItemImgRepository;
 import com.fp.backend.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,24 +61,17 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(int page, int size) {
+    public List<ItemFormDto> getItemList(Long cursorId, Pageable page) {
 //        List<Item> itemList = itemRepository.findByIsSoldout(false);
 //        List<Item> itemList = itemRepository.findByIsSoldoutOrderByIdDesc(false, lastId, pageRequest );
-/*
-        Slice<Item> itemList;
-        if (lastId == 0) {
-            itemList = itemRepository.findFirstPage(lastId, size);
-        } else {
-           itemList = itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, lastId, pageRequest);
-        }
-*/
-/*        // cursor
-        List<Item> itemList = (cursorId == 0) ?
-                this.itemRepository.findByIsSoldoutOrderByIdDesc(false, cursorId, page) :
-                this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, cursorId, page);*/
-        PageRequest pageRequest = PageRequest.of(page - 1, size);
-        List<Item> itemList = this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, pageRequest);
 
+        // cursor
+        Slice<Item> itemList = (cursorId == 0) ?
+                this.itemRepository.findByIsSoldoutAndIdOrderByIdDesc(false, cursorId, page) :
+                this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, cursorId, page);
+        /*PageRequest pageRequest = PageRequest.of(page - 1, size);
+        List<Item> itemList = this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, pageRequest);
+*/
 
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
