@@ -40,29 +40,17 @@ public class ItemController {
     }
 
 /*    @GetMapping("/item/list")
-    public List<ItemFormDto> getItemList() {
+    public ResponseEntity<List<ItemFormDto>> getItemList() {
         System.out.println("아이템 요청");
-        return itemService.getItemList();
+        List<ItemFormDto> itemList = itemService.getItemList();
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
     }*/
 
     @GetMapping("/item/list")
-    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam Long cursorId,
-                                          int size) {
-        System.out.println("아이템 요청: " + cursorId);
-        System.out.println("아이템 요청: " + size);
-
-        Pageable page = PageRequest.of(0, size);
-
-        List<ItemFormDto> itemList = itemService.getItemList(cursorId, page);
-        System.out.println("itemList = " + itemList);
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam Long page) {
+        System.out.println("아이템 요청");
+        List<ItemFormDto> itemList = itemService.getItemList(page);
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
-
-/*        @GetMapping("/item/list")
-    public List<ItemFormDto> getItemList(@RequestParam int page,
-                                         @RequestParam int size) {
-        System.out.println("아이템 요청");
-        return itemService.getItemList(page, size);
-    }*/
 
 }

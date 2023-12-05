@@ -59,7 +59,7 @@ dependencies {
     //jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
 
-    // ryugahee
+
     implementation 'org.modelmapper:modelmapper:2.4.2'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-devtools'

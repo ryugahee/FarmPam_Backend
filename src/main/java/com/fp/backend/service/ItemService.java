@@ -1,7 +1,6 @@
 package com.fp.backend.service;
 
 
-import com.fp.backend.controller.CursorResult;
 import com.fp.backend.dto.ItemFormDto;
 import com.fp.backend.dto.ItemImgDto;
 import com.fp.backend.entity.Item;
@@ -28,6 +27,11 @@ public class ItemService {
     private final ItemImgRepository itemImgRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
+
+/*
+    @Autowired
+    ItemDAORepository itemDAORepository;
+*/
 
 
     public Long saveItem(ItemFormDto itemFormDto,
@@ -61,20 +65,13 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(Long cursorId, Pageable page) {
-//        List<Item> itemList = itemRepository.findByIsSoldout(false);
-//        List<Item> itemList = itemRepository.findByIsSoldoutOrderByIdDesc(false, lastId, pageRequest );
+    public List<ItemFormDto> getItemList(Long page) {
 
-        // cursor
-        Slice<Item> itemList = (cursorId == 0) ?
-                this.itemRepository.findByIsSoldoutAndIdOrderByIdDesc(false, cursorId, page) :
-                this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, cursorId, page);
-        /*PageRequest pageRequest = PageRequest.of(page - 1, size);
-        List<Item> itemList = this.itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, pageRequest);
-*/
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Item> itemList = itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, page, pageable);
 
 
-        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+                List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
             ItemFormDto itemFormDto = ItemFormDto.of(item);
 
