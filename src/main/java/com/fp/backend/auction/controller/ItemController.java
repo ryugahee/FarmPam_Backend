@@ -1,11 +1,10 @@
 package com.fp.backend.auction.controller;
 
 import com.fp.backend.auction.dto.ItemFormDto;
+import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,18 +36,23 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-/*    @GetMapping("/item/list")
-    public ResponseEntity<List<ItemFormDto>> getItemList() {
-        System.out.println("아이템 요청");
-        List<ItemFormDto> itemList = itemService.getItemList();
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
-    }*/
-
     @GetMapping("/item/list")
     public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam("num") Long num) {
         System.out.println("아이템 요청: " + num);
         List<ItemFormDto> itemList = itemService.getItemList(num);
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
+
+    @DeleteMapping("/item/delete/{id}")
+    public ResponseEntity<ItemFormDto> deleteItem(@PathVariable("itemId") Long id) {
+        System.out.println("삭제 요청: " + id);
+        ItemFormDto itemDeleted = itemService.delete(id);
+
+        if (itemDeleted != null) {
+            return new ResponseEntity<>(itemDeleted, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    };
 
 }

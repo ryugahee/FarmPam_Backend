@@ -40,4 +40,7 @@ public class ItemTagMapService {
         return itemTagMapRepository.findAllByItem(item);
     }
 
+    public void deleteItemTagByItem(Item target) {
+        itemTagMapRepository.deleteByItem(target);
+    }
 }

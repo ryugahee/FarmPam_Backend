@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +63,6 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList(Long num) {
 
-
-//        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id"));
-//        Slice<Item> itemList = itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num);
         Slice<Item> itemList = (num == 1) ?
                 this.itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num) :
                 this.itemRepository.findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(num);
@@ -88,5 +86,28 @@ public class ItemService {
         }
         return itemFormDtoList;
     }
+
+
+    @Transactional
+    public ItemFormDto delete(Long id) {
+        Item target = itemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품 삭제 실패!"));
+
+        // 상품 삭제
+        itemRepository.delete(target);
+
+        // 상품 이미지 삭제
+        List<ItemImg> itemImgList = itemImgRepository.findByItem(target);
+        for (ItemImg itemImg : itemImgList) {
+            itemImgRepository.delete(itemImg);
+        }
+
+        // 상품 태그 삭제
+        itemTagMapService.deleteItemTagByItem(target);
+
+        return ItemFormDto.of(target);
+
+    }
+
 
 }
