@@ -1,25 +1,24 @@
 package com.fp.backend.repository;
 
 import com.fp.backend.entity.Item;
-import org.springframework.data.domain.PageRequest;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Query;
 
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-//    ArrayList<Item> findAll();
 
-    List<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout, Long page, Pageable pageable);
+//    @Query
+//    Page<Item> findByIsSoldoutFalseAndIdOrderByIdDesc(Long num, Pageable pageable);
 
-//    Slice<Item> findByIsSoldoutAndIdOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
 
-//    Slice<Item> findByIsSoldoutAndIdLessThanOrderByIdDesc(Boolean isSoldout, Long cursorId, Pageable page);
+    @Query("SELECT i FROM Item i WHERE i.isSoldout = false AND i.id > :num ORDER BY i.id DESC Limit 7")
+    Slice<Item> findByIsSoldoutFalseAndIdOrderByIdDesc(@Param("num") Long num);
 
-//    Slice<Item> findByIsSoldout(Boolean isSoldout, Pageable page);
-
-//    Slice<Item> findByIdLessThanAndIsSoldoutOrderByIdDesc(Long id, Boolean isSoldout, Pageable page);
+    @Query("SELECT i FROM Item i WHERE i.isSoldout = false AND i.id < :num ORDER BY i.id DESC Limit 7")
+    Slice<Item> findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(@Param("num") Long num);
 
 }

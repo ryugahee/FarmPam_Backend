@@ -4,10 +4,8 @@ import com.fp.backend.dto.ItemFormDto;
 import com.fp.backend.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +45,9 @@ public class ItemController {
     }*/
 
     @GetMapping("/item/list")
-    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam Long page) {
-        System.out.println("아이템 요청");
-        List<ItemFormDto> itemList = itemService.getItemList(page);
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam("num") Long num) {
+        System.out.println("아이템 요청: " + num);
+        List<ItemFormDto> itemList = itemService.getItemList(num);
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 

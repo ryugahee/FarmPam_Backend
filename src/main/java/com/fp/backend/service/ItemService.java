@@ -28,11 +28,6 @@ public class ItemService {
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
 
-/*
-    @Autowired
-    ItemDAORepository itemDAORepository;
-*/
-
 
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception{
@@ -65,13 +60,18 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(Long page) {
-
-        Pageable pageable = PageRequest.of(0, 5);
-        List<Item> itemList = itemRepository.findByIsSoldoutAndIdLessThanOrderByIdDesc(false, page, pageable);
+    public List<ItemFormDto> getItemList(Long num) {
 
 
-                List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+//        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "id"));
+//        Slice<Item> itemList = itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num);
+        Slice<Item> itemList = (num == 1) ?
+                this.itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num) :
+                this.itemRepository.findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(num);
+        System.out.println("아이템갯수: " + itemList.getSize());
+
+
+        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
             ItemFormDto itemFormDto = ItemFormDto.of(item);
 
@@ -81,7 +81,6 @@ public class ItemService {
                 ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
                 itemImgDtoList.add(itemImgDto);
 
-                System.out.println("대표이미지: " + itemImgList);
             }
             itemFormDto.setItemImgDtoList(itemImgDtoList);
 
