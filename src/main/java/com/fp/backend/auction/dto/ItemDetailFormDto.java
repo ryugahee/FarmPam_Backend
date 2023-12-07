@@ -32,21 +32,22 @@ public class ItemDetailFormDto {
 
     private static ModelMapper modelMapper = new ModelMapper();
 
-/*    public static ItemDetailFormDto of(Optional<Item> item) {
-        ItemDetailFormDto itemDetailFormDto = modelMapper.map(item, ItemDetailFormDto.class);
-
-        return itemDetailFormDto;
-    }*/
-
     public static ItemDetailFormDto of(Item item) {
         ItemDetailFormDto itemDetailFormDto = modelMapper.map(item, ItemDetailFormDto.class);
+
+        // 남은 경매 시간
+        long currentTimeMillis = System.currentTimeMillis();
+        long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
+        if (elapsedTimeInMillis > 0) {
+            itemDetailFormDto.setTime(elapsedTimeInMillis);
+            System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
+        } else {
+            itemDetailFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+        }
 
         return itemDetailFormDto;
     }
 
-//    public Item createItem() {
-//        return modelMapper.map(this, Item.class);
-//    }
 
     // 추가할 것 - 작성자 프로필사진, 닉네임, 별점
 }

@@ -47,8 +47,6 @@ public class ItemFormDto {
         // 남은 경매 시간
         long currentTimeMillis = System.currentTimeMillis();
         long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
-/*        itemFormDto.setTime(elapsedTimeInMillis);
-        System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);*/
         if (elapsedTimeInMillis > 0) {
             itemFormDto.setTime(elapsedTimeInMillis);
             System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
