@@ -1,15 +1,13 @@
 package com.fp.backend.service;
 
+import com.fp.backend.controller.FileS3UploadController;
 import com.fp.backend.entity.ItemImg;
 import com.fp.backend.repository.ItemImgRepository;
-import com.google.api.client.util.Value;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 
 @Service
 @RequiredArgsConstructor
@@ -18,38 +16,15 @@ public class ItemImgService {
 
     private final ItemImgRepository itemImgRepository;
 
-    private final FileService fileService;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
-    public String makeDir() {
-
-        String folderPath = "C:\\auction\\imges\\item";
-
-        File makeFolder = new File(folderPath);
-
-        if(!makeFolder.exists()) {
-
-            makeFolder.mkdirs();
-            System.out.println("폴더를 생성합니다.");
-
-        } else {
-            System.out.println("이미 해당 폴더가 존재합니다.");
-        }
-        return folderPath;
-    }
+    private final FileS3UploadController fileS3UploadController;
 
     public void saveItemImg(ItemImg itemImg, MultipartFile itemImgFile) throws Exception {
         String oriImgName = itemImgFile.getOriginalFilename();
         String imgName = "";
         String imgUrl = "";
 
-        String itemImgLocation = makeDir();
-
         if (!StringUtils.isEmpty(oriImgName)) {
-            imgName = fileService.uploadFile(itemImgLocation, oriImgName, itemImgFile.getBytes());
-            imgUrl = "/imges/item/" + imgName;
+            imgUrl = fileS3UploadController.s3FileUpload(itemImgFile);
         }
 
         itemImg.updateItemImg(oriImgName, imgName, imgUrl);
