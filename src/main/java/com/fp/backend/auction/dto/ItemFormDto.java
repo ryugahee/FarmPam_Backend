@@ -45,14 +45,17 @@ public class ItemFormDto {
         ItemFormDto itemFormDto = modelMapper.map(item, ItemFormDto.class);
 
         // 남은 경매 시간
-        long currentTimeMillis = System.currentTimeMillis();
-        long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
-        if (elapsedTimeInMillis > 0) {
-            itemFormDto.setTime(elapsedTimeInMillis);
-            System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = item.getTime() - currentTime;
+        if (elapsedTime > 0) {
+            itemFormDto.setTime(elapsedTime);
+            System.out.println("경매마감시간-현재시간: " + elapsedTime);
         } else {
-            itemFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+            itemFormDto.setTime(0);
+            itemFormDto.setIsSoldout(true);
         }
+
+//        System.out.println("트루로 바꼈는지? : " + itemFormDto.getIsSoldout());
 
 
         return itemFormDto;

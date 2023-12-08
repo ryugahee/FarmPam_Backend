@@ -41,6 +41,7 @@ public class ItemService {
         Item item = itemFormDto.createItem();
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
+
         item.setTime(updatedTime);
 
         item.setIsSoldout(false);
@@ -73,9 +74,9 @@ public class ItemService {
                 this.itemRepository.findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(num);
         System.out.println("아이템갯수: " + itemList.getSize());
 
-
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
+
             ItemFormDto itemFormDto = ItemFormDto.of(item);
 
             List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
@@ -87,7 +88,10 @@ public class ItemService {
             }
             itemFormDto.setItemImgDtoList(itemImgDtoList);
 
+            if (!itemFormDto.getIsSoldout()) {
             itemFormDtoList.add(itemFormDto);
+            }
+
         }
         return itemFormDtoList;
     }
