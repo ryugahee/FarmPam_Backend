@@ -30,6 +30,8 @@ public class ItemDetailFormDto {
 
     private List<ItemImgDto> itemImgDtoList = new ArrayList<>();
 
+    private List<String> tagNames;
+
     private static ModelMapper modelMapper = new ModelMapper();
 
     public static ItemDetailFormDto of(Item item) {

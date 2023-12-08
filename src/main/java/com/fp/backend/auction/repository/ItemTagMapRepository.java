@@ -10,4 +10,7 @@ public interface ItemTagMapRepository extends JpaRepository<ItemTagMap, Long> {
     List<ItemTagMap> findAllByItem(Item item);
 
     void deleteByItem(Item target);
+
+    List<ItemTagMap> findByItem(Item item);
+
 }

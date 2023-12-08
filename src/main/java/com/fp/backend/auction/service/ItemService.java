@@ -6,8 +6,11 @@ import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.dto.ItemImgDto;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
+import com.fp.backend.auction.entity.ItemTag;
+import com.fp.backend.auction.entity.ItemTagMap;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
+import com.fp.backend.auction.repository.ItemTagMapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -28,6 +32,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
+    private final ItemTagMapRepository itemTagMapRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
 
@@ -122,7 +127,7 @@ public class ItemService {
 
         ItemDetailFormDto itemDetailFormDto = ItemDetailFormDto.of(item);
 
-        // 아이템에 매핑된 이미지들을 불러옴
+        // 이미지 불러옴
         List<ItemImg> itemImgList = itemImgRepository.findByItem(item);
         List<ItemImgDto> itemImgDtoList = new ArrayList<>();
         for (ItemImg itemImg : itemImgList) {
@@ -130,6 +135,13 @@ public class ItemService {
             itemImgDtoList.add(itemImgDto);
         }
         itemDetailFormDto.setItemImgDtoList(itemImgDtoList);
+
+        // 태그 불러옴
+        List<ItemTagMap> itemTagMaps = itemTagMapRepository.findByItem(item);
+        List<String> tagNames = itemTagMaps.stream()
+                .map(itemTagMap -> itemTagMap.getItemTag().getTagName())
+                .collect(Collectors.toList());
+        itemDetailFormDto.setTagNames(tagNames);
 
         return itemDetailFormDto;
 
