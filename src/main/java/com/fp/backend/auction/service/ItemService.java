@@ -6,7 +6,6 @@ import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.dto.ItemImgDto;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
-import com.fp.backend.auction.entity.ItemTag;
 import com.fp.backend.auction.entity.ItemTagMap;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
@@ -16,8 +15,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
