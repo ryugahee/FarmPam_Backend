@@ -1,6 +1,8 @@
 package com.fp.backend.auction.controller;
 
+import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
+import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class ItemController {
 
     private final ItemService itemService;
 
+    // 경매 등록
     @PostMapping("/item/new")
     public ResponseEntity<String> itemNew(@Valid ItemFormDto itemFormDto,
                                           @RequestParam("files") List<MultipartFile> itemImgFileList) {
@@ -35,12 +38,34 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // 최신순 리스트
     @GetMapping("/item/list")
-    public List<ItemFormDto> getItemList() {
-        System.out.println("아이템 요청");
-        return itemService.getItemList();
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam("num") Long num) {
+        System.out.println("최신 리스트 요청: " + num);
+        List<ItemFormDto> itemList = itemService.getItemList(num);
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
+    // 경매 삭제
+    @DeleteMapping("/item/delete/{itemId}")
+    public ResponseEntity<ItemFormDto> deleteItem(@PathVariable("itemId") Long id) {
+        System.out.println("삭제 요청: " + id);
+        ItemFormDto itemDeleted = itemService.delete(id);
+
+        if (itemDeleted != null) {
+            return new ResponseEntity<>(itemDeleted, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    };
+
+    // 경매 디테일
+    @GetMapping("/item/detail/{id}")
+    public ResponseEntity<ItemDetailFormDto> getItemDetail(@PathVariable("id") Long id) {
+        System.out.println("경매 디테일 요청: " + id);
+        ItemDetailFormDto itemDetail = itemService.getItemDetail(id);
+        return new ResponseEntity<>(itemDetail, HttpStatus.OK);
+    }
 
 
 }

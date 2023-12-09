@@ -14,7 +14,7 @@ public class ItemDto {
 
     private String itemDetail;
 
-    private int time;
+    private long time;
 
     private String itemType;
 
