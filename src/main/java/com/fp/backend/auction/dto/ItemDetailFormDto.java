@@ -3,15 +3,13 @@ package com.fp.backend.auction.dto;
 import com.fp.backend.auction.entity.Item;
 import lombok.Getter;
 import lombok.Setter;
-import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.modelmapper.ModelMapper;
 
 @Getter @Setter
-public class ItemFormDto {
-
+public class ItemDetailFormDto {
     private Long id;
 
     private String itemTitle;
@@ -30,37 +28,26 @@ public class ItemFormDto {
 
     private List<ItemImgDto> itemImgDtoList = new ArrayList<>();
 
-    // 상품 이미지 아이디를 저장 (상품 수정시 이미지 저장)
-    private List<Long> itemImgIds = new ArrayList<>();
-
-    // 태그 저장
     private List<String> tagNames;
 
     private static ModelMapper modelMapper = new ModelMapper();
 
-    public Item createItem() {
-        return modelMapper.map(this, Item.class);
-    }
-    public static ItemFormDto of(Item item) {
-        ItemFormDto itemFormDto = modelMapper.map(item, ItemFormDto.class);
+    public static ItemDetailFormDto of(Item item) {
+        ItemDetailFormDto itemDetailFormDto = modelMapper.map(item, ItemDetailFormDto.class);
 
         // 남은 경매 시간
         long currentTimeMillis = System.currentTimeMillis();
         long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
         if (elapsedTimeInMillis > 0) {
-            itemFormDto.setTime(elapsedTimeInMillis);
+            itemDetailFormDto.setTime(elapsedTimeInMillis);
             System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
         } else {
-            itemFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+            itemDetailFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
         }
 
-
-        return itemFormDto;
-
-
-//        return modelMapper.map(item, ItemFormDto.class);
+        return itemDetailFormDto;
     }
 
 
-    // 추가할 것 - 작성자 정보
+    // 추가할 것 - 작성자 프로필사진, 닉네임, 별점
 }
