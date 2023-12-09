@@ -76,6 +76,9 @@ dependencies {
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
+    // MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:3.1.2'
+
 }
 
 tasks.named('bootBuildImage') {
