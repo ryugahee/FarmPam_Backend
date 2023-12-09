@@ -64,6 +64,7 @@ public class ItemService {
         return item.getId();
     }
 
+
     // 경매 최신 리스트
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList(Long num) {
