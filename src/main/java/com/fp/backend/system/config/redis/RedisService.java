@@ -1,14 +1,15 @@
 package com.fp.backend.system.config.redis;
 
+import com.fp.backend.system.config.websocket.SocketVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,12 +34,37 @@ public class RedisService {
         }
         return (String) values.get(key);
     }
+    public void setValuesPush(String key, String data){
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+        list.leftPush(key, data);
+    }
+    public String getValuesLastIndex(String key){
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+        return (String) list.index(key, 0);
+    }
+    @Transactional(readOnly = true)
+    public List<SocketVO> getValuesListAll(String key){
+        ListOperations<String,Object> list = redisTemplate.opsForList();
+        List<SocketVO> stringList = new ArrayList<>();
+        List<Object> bidList = list.range(key, 0, -1);
+        for(int i = bidList.size()-1; i >= 0; i--){
+            Object bid = list.index(key, i);
+            SocketVO socketVO = new SocketVO(key, bid);
+            stringList.add(socketVO);
+        }
+
+        return stringList;
+    }
+
+
     public void deleteValues(String key){
         redisTemplate.delete(key);
     }
     public void expireValues(String key, int timeout){
         redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
     }
+
+
     public void setHashOps(String key, Map<String, String> data) {
         HashOperations<String, Object, Object> values = redisTemplate.opsForHash();
         values.putAll(key, data);

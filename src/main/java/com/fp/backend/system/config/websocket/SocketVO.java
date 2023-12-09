@@ -5,17 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-@Builder
+
 @AllArgsConstructor
 public class SocketVO {
-    public enum MessageType{
-        ENTER, TALK, LEAVE
-    }
-    private MessageType type;
-    private String roomId;
-    private String publisher;
-    private String userName;
-    private String content;
-    private String time;
+    private String bidId;
+    private Object content;
 }
