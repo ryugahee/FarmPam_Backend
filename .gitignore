@@ -39,3 +39,5 @@ application-mysql.properties
 ### VS Code ###
 .vscode/
 
+### AWS ###
+src/main/resources/aws.yml
