@@ -65,13 +65,22 @@ public class ItemService {
         return item.getId();
     }
 
-    // 경매 최신 리스트
+    // 경매 리스트
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(Long num) {
+    public List<ItemFormDto> getItemList(int page, String sortType) {
 
-        Slice<Item> itemList = (num == 1) ?
-                this.itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num) :
-                this.itemRepository.findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(num);
+        Slice<Item> itemList;
+
+        System.out.println("타입: " + sortType);
+
+        if (sortType != null && sortType.equals("time")) {
+            PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
+            itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+        } else {
+            PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
+            itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
+        }
+
         System.out.println("아이템갯수: " + itemList.getSize());
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
@@ -91,6 +100,9 @@ public class ItemService {
             if (!itemFormDto.getIsSoldout()) {
             itemFormDtoList.add(itemFormDto);
             }
+
+            System.out.println("시간: " + itemFormDto.getTime());
+            System.out.println("솔아: " + itemFormDto.getIsSoldout());
 
         }
         return itemFormDtoList;
@@ -146,5 +158,23 @@ public class ItemService {
 
         return itemDetailFormDto;
 
+    }
+
+
+    public void updateExpiredItems() {
+        long currentTimeMillis = System.currentTimeMillis();
+        List<Item> expiredItems = itemRepository.findByTimeLessThan(currentTimeMillis);
+
+        System.out.println("현재시간: " + currentTimeMillis());
+
+        for (Item item : expiredItems) {
+            // 현재 시간보다 마감 시간이 이전인 경우 음수 값을 0으로 업데이트
+            if (item.getTime() < System.currentTimeMillis()) {
+                item.setTime(0);
+            }
+        }
+
+        // 업데이트된 Item 저장
+        itemRepository.saveAll(expiredItems);
     }
 }

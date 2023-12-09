@@ -45,8 +45,7 @@ public class ItemFormDto {
         ItemFormDto itemFormDto = modelMapper.map(item, ItemFormDto.class);
 
         // 남은 경매 시간
-        long currentTime = System.currentTimeMillis();
-        long elapsedTime = item.getTime() - currentTime;
+        long elapsedTime = item.getTime() - System.currentTimeMillis();
         if (elapsedTime > 0) {
             itemFormDto.setTime(elapsedTime);
             System.out.println("경매마감시간-현재시간: " + elapsedTime);
@@ -55,13 +54,8 @@ public class ItemFormDto {
             itemFormDto.setIsSoldout(true);
         }
 
-//        System.out.println("트루로 바꼈는지? : " + itemFormDto.getIsSoldout());
-
-
         return itemFormDto;
 
-
-//        return modelMapper.map(item, ItemFormDto.class);
     }
 
 
