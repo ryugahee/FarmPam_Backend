@@ -75,8 +75,10 @@ public class ItemService {
         System.out.println("타입: " + keyword);
 
         if (keyword != null) {
-            PageRequest pageable = PageRequest.of(page, 7, Sort.by("keyword").ascending());
+            PageRequest pageable = PageRequest.of(page, 7);
             itemList = this.itemRepository.findByKeywordAndNotSoldOut(keyword, pageable);
+
+//            itemList = itemRepository.findByItemTitle(keyword);
         } else {
             if (sortType != null && sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());

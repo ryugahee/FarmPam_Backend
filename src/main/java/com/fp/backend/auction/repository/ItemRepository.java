@@ -25,6 +25,15 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "AND i.isSoldout = false")
     Slice<Item> findByKeywordAndNotSoldOut(@Param("keyword") String keyword, PageRequest pageable);
 
+//    @Query("SELECT DISTINCT i FROM Item i " +
+//            "LEFT JOIN i.itemTagMapList itm " +
+//            "LEFT JOIN itm.itemTag it " +
+//            "WHERE i.itemTitle =  :itemTitle "
+//            )
+//    Slice<Item> findByKeywordAndNotSoldOut(@Param("itemTitle") String itemTitle, PageRequest pageable);
+
+//    Slice<Item> findByItemTitle(String keyword);
+
 }
 
 
