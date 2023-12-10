@@ -4,8 +4,10 @@ import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.service.ItemService;
+import com.fp.backend.system.config.redis.RedisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +27,18 @@ public class ItemController {
     public ResponseEntity<String> itemNew(@Valid ItemFormDto itemFormDto,
                                           @RequestParam("files") List<MultipartFile> itemImgFileList) {
 
+        
         if (itemImgFileList.get(0).isEmpty() && itemFormDto.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첫번째 상품 이미지는 필수 입력 값입니다.");
         }
         try {
             itemService.saveItem(itemFormDto, itemImgFileList);
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 등록 중 에러가 발생했습니다.");
         }
+
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
