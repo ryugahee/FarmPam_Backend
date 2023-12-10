@@ -19,6 +19,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://software.amazon.awssdk:main/release'  // Amazon Maven Repository
+    }
 }
 
 dependencies {
@@ -54,10 +57,6 @@ dependencies {
 //    Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-//    DynamoDB
-    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.529'
-    implementation 'com.github.derjust:spring-data-dynamodb:5.0.4'
-
 //    FCM
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
@@ -78,7 +77,7 @@ dependencies {
 
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
+    implementation 'software.amazon.awssdk:s3:2.17.41'
     // RDS
     implementation 'software.amazon.awssdk:s3'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

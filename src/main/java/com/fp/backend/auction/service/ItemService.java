@@ -10,6 +10,7 @@ import com.fp.backend.auction.entity.ItemTagMap;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
+import com.fp.backend.system.config.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class ItemService {
     private final ItemTagMapRepository itemTagMapRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
-
+    private final RedisService redisService;
     // 경매 등록
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception {
@@ -60,6 +61,10 @@ public class ItemService {
 
         // 태그 등록
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
+
+        String Id = String.valueOf(item.getId());
+        String minPrice = String.valueOf(item.getMinPrice());
+        redisService.setValuesPush(Id, minPrice);
 
         return item.getId();
     }
