@@ -3,9 +3,9 @@ package com.fp.backend.account.controller;
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
 import com.fp.backend.account.dto.TokenDto;
-import com.fp.backend.account.entity.Member;
-import com.fp.backend.system.jwt.TokenProvider;
+import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.service.UserService;
+import com.fp.backend.system.jwt.TokenProvider;
 import com.fp.backend.system.util.UUIDProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +16,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -32,7 +35,7 @@ public class MemberController {
     private final UUIDProvider uuidProvider;
 
     @PostMapping("/user/signup")
-    public ResponseEntity<Member> signup(@RequestBody SignupDto dto) {
+    public ResponseEntity<Users> signup(@RequestBody SignupDto dto) {
 
         System.out.println("회원가입 요청: " + dto.getUserName());
 
@@ -40,7 +43,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginDto dto , HttpServletResponse response) {
+    public ResponseEntity<TokenDto> login(@RequestBody LoginDto dto, HttpServletResponse response) {
 
         System.out.println("로그인 요청 컨트롤러 진입: " + dto);
 
