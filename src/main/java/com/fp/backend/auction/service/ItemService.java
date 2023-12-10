@@ -67,18 +67,24 @@ public class ItemService {
 
     // 경매 리스트
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(int page, String sortType) {
+    public List<ItemFormDto> getItemList(int page, String sortType, String keyword) {
 
         Slice<Item> itemList;
 
         System.out.println("타입: " + sortType);
+        System.out.println("타입: " + keyword);
 
-        if (sortType != null && sortType.equals("time")) {
-            PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
-            itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+        if (keyword != null) {
+            PageRequest pageable = PageRequest.of(page, 7, Sort.by("keyword").ascending());
+            itemList = this.itemRepository.findByKeywordAndNotSoldOut(keyword, pageable);
         } else {
-            PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
-            itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
+            if (sortType != null && sortType.equals("time")) {
+                PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
+                itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+            } else {
+                PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
+                itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
+            }
         }
 
         System.out.println("아이템갯수: " + itemList.getSize());
@@ -161,6 +167,7 @@ public class ItemService {
     }
 
 
+    // 스케줄러
     public void updateExpiredItems() {
         long currentTimeMillis = System.currentTimeMillis();
         List<Item> expiredItems = itemRepository.findByTimeLessThan(currentTimeMillis);
@@ -168,13 +175,11 @@ public class ItemService {
         System.out.println("현재시간: " + currentTimeMillis());
 
         for (Item item : expiredItems) {
-            // 현재 시간보다 마감 시간이 이전인 경우 음수 값을 0으로 업데이트
             if (item.getTime() < System.currentTimeMillis()) {
                 item.setTime(0);
+                item.setIsSoldout(true);
             }
         }
-
-        // 업데이트된 Item 저장
         itemRepository.saveAll(expiredItems);
     }
 }

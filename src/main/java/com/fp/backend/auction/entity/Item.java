@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -39,5 +42,8 @@ public class Item extends BaseEntity {
 
     @Column
     private Boolean isSoldout;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemTagMap> itemTagMapList = new ArrayList<>();
 
 }

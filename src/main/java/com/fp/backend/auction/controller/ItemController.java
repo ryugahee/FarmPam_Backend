@@ -43,9 +43,14 @@ public class ItemController {
     // 리스트 조회
     @GetMapping("/item/list")
     public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam int page,
-                                                         @RequestParam(required = false) String sortType) {
+                                                         @RequestParam(required = false) String sortType,
+                                                         @RequestParam(value = "keyword", required = false) String keyword) {
 
-        List<ItemFormDto> itemList = itemService.getItemList(page, sortType);
+        if (keyword == null) {
+            keyword = "";
+        }
+        List<ItemFormDto> itemList = itemService.getItemList(page, sortType, keyword);
+
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 

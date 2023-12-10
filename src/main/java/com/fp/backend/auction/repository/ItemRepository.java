@@ -16,6 +16,15 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Slice<Item> findByIsSoldoutFalseOrderByIdDesc(PageRequest pageable);
 
     List<Item> findByTimeLessThan(long currentTimeMillis);
+
+    @Query("SELECT DISTINCT i FROM Item i " +
+            "LEFT JOIN i.itemTagMapList itm " +
+            "LEFT JOIN itm.itemTag it " +
+            "WHERE (LOWER(i.itemTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(it.tagName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND i.isSoldout = false")
+    Slice<Item> findByKeywordAndNotSoldOut(@Param("keyword") String keyword, PageRequest pageable);
+
 }
 
 
