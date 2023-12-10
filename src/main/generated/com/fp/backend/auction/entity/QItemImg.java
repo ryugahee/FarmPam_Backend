@@ -35,18 +35,12 @@ public class QItemImg extends EntityPathBase<ItemImg> {
 
     public final QItem item;
 
-    //inherited
-    public final StringPath modifiedBy = _super.modifiedBy;
-
     public final StringPath oriImgName = createString("oriImgName");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regTime = _super.regTime;
 
     public final StringPath repImgYn = createString("repImgYn");
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QItemImg(String variable) {
         this(ItemImg.class, forVariable(variable), INITS);

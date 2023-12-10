@@ -34,13 +34,7 @@ public class QItemTagMap extends EntityPathBase<ItemTagMap> {
     public final QItemTag itemTag;
 
     //inherited
-    public final StringPath modifiedBy = _super.modifiedBy;
-
-    //inherited
     public final DateTimePath<java.time.LocalDateTime> regTime = _super.regTime;
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QItemTagMap(String variable) {
         this(ItemTagMap.class, forVariable(variable), INITS);

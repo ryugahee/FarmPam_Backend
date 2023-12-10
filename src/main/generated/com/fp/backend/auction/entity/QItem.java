@@ -37,15 +37,9 @@ public class QItem extends EntityPathBase<Item> {
     public final NumberPath<Integer> minPrice = createNumber("minPrice", Integer.class);
 
     //inherited
-    public final StringPath modifiedBy = _super.modifiedBy;
-
-    //inherited
     public final DateTimePath<java.time.LocalDateTime> regTime = _super.regTime;
 
-    public final NumberPath<Integer> time = createNumber("time", Integer.class);
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
+    public final NumberPath<Long> time = createNumber("time", Long.class);
 
     public final NumberPath<Integer> weight = createNumber("weight", Integer.class);
 

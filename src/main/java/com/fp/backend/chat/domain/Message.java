@@ -11,6 +11,5 @@ public class Message {
 
     private String message;
 
-    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
-    private String updateAt;
+    private String updatedAt;
 }

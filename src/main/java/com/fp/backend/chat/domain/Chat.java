@@ -1,9 +1,7 @@
 package com.fp.backend.chat.domain;
 
 import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -12,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class Chat {
 
     @Transient
-    private static final String SEQUENCE_NAME = "chats_sequence";
+    public static final String SEQUENCE_NAME = "chats_sequence";
 
     @Id
     private Long chatId;
@@ -31,12 +30,22 @@ public class Chat {
 
     private String secondUserId;
 
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
-    @Column(updatable = false)
-    @CreatedDate
-    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private String createdAt;
 
     private Long itemId;
+
+    @Builder
+    public Chat(Long chatId, String firstUserId, String secondUserId, String createdAt, Long itemId) {
+        this.chatId = chatId;
+        this.firstUserId = firstUserId;
+        this.secondUserId = secondUserId;
+        this.createdAt = createdAt;
+        this.itemId = itemId;
+    }
+
+    public void addMessage(Message message) {
+        this.messages.add(message);
+    }
 }

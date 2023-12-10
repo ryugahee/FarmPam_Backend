@@ -3,11 +3,11 @@ package com.fp.backend.chat.dto;
 import lombok.Data;
 
 @Data
-public class ChatDataDTO {
+public class MessageDTO {
 
-    private String fromName;
+    private String fromUserId;
 
     private String message;
 
-    private Long itemId;
+    private String updateAt;
 }

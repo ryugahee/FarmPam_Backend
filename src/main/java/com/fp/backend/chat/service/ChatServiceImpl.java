@@ -1,6 +1,5 @@
 package com.fp.backend.chat.service;
 
-import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
@@ -10,6 +9,8 @@ import com.fp.backend.chat.domain.Chat;
 import com.fp.backend.chat.domain.Message;
 import com.fp.backend.chat.dto.ChatDetailInfoDTO;
 import com.fp.backend.chat.dto.ChatPreviewInfoDTO;
+import com.fp.backend.chat.dto.NewChatInfoDTO;
+import com.fp.backend.chat.dto.SendMessageDTO;
 import com.fp.backend.chat.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,10 @@ public class ChatServiceImpl implements ChatService {
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
     private final UserRepository userRepository;
+    private final SequenceGeneratorService sequenceGeneratorService;
 
     @Override
-    public List<Long> getIds(String userId) {
+    public List<Long> getChatIds(String userId) {
         log.info("{}의 채팅 내역 검색", userId);
         return chatRepository.findChatsByFirstUserIdOrSecondUserId(userId)
                 .stream().map(Chat::getChatId).collect(Collectors.toList());
@@ -41,6 +43,9 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<ChatPreviewInfoDTO> getChatPreviewInfos(List<Long> chatIds, String userId) {
+
+        log.info("채팅방 미리보기 정보 가져오기: getChatPreviewInfos");
+
         List<ChatPreviewInfoDTO> result = new ArrayList<>();
 
         // TODO: chatIds를 Chat 도큐먼트에 firstUserId, secondUserId, itemId, lastMessage 찾은 후
@@ -81,7 +86,7 @@ public class ChatServiceImpl implements ChatService {
                     .toNickName("테스트 아이디") // FIXME: 테스트용 지울 것
                     .toNickNameThumbnailUrl("../../public/assets/img/profile1.png")
                     .lastMessage(message.getMessage())
-                    .updateTime(message.getUpdateAt())
+                    .updateTime(message.getUpdatedAt())
                     .itemThumbnailUrl(itemImg.getImgUrl())
                     .build());
         }
@@ -127,8 +132,34 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<Message> getChatMessages(Long chatId) {
 
+        log.info("채팅 메시지 가져오기: getChatMessages");
+
         Chat chat = getChat(chatId);
         return chat.getMessages();
+    }
+
+    @Override
+    @Transactional
+    public void sendMessage(SendMessageDTO dto) {
+
+        log.info("채팅 메시지 보내기: sendMessage");
+
+        Chat chat = getChat(dto.getChatId());
+        chat.addMessage(dto.getMessage());
+
+        chatRepository.save(chat);
+    }
+
+    @Override
+    @Transactional
+    public Long createChat(NewChatInfoDTO dto) {
+
+        log.info("채팅방 생성: createChat");
+
+        Long newChatId = sequenceGeneratorService.generateSequence(Chat.SEQUENCE_NAME);
+        Chat chat = dtoToEntity(dto, newChatId);
+        chatRepository.save(chat);
+        return newChatId;
     }
 
     private Chat getChat(Long chatId) {

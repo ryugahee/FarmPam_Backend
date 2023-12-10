@@ -23,13 +23,8 @@ public class QBaseEntity extends EntityPathBase<BaseEntity> {
 
     public final StringPath createdBy = createString("createdBy");
 
-    public final StringPath modifiedBy = createString("modifiedBy");
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regTime = _super.regTime;
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QBaseEntity(String variable) {
         super(BaseEntity.class, forVariable(variable));

@@ -30,15 +30,9 @@ public class QItemTag extends EntityPathBase<ItemTag> {
     public final ListPath<ItemTagMap, QItemTagMap> itemTagMapList = this.<ItemTagMap, QItemTagMap>createList("itemTagMapList", ItemTagMap.class, QItemTagMap.class, PathInits.DIRECT2);
 
     //inherited
-    public final StringPath modifiedBy = _super.modifiedBy;
-
-    //inherited
     public final DateTimePath<java.time.LocalDateTime> regTime = _super.regTime;
 
     public final StringPath tagName = createString("tagName");
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> updateTime = _super.updateTime;
 
     public QItemTag(String variable) {
         super(ItemTag.class, forVariable(variable));
