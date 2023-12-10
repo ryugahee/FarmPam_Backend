@@ -1,11 +1,12 @@
 package com.fp.backend.auction.bid.controller;
 
 
-import com.fp.backend.system.config.redis.RedisService;
+import com.fp.backend.auction.bid.service.BidService;
 import com.fp.backend.system.config.websocket.SocketVO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class BidController {
 
-    private final RedisService redisService;
+    private final BidService bidService;
 
 
 
@@ -27,22 +28,21 @@ public class BidController {
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println(redisService.getValuesListAll(bidId));
-        return redisService.getValuesListAll(bidId);
+        return bidService.getValuesListAll(bidId);
     }
 
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
-    public SocketVO bidPush(SocketVO socketVO){
+    public Object bidPush(@Payload SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println("PushName = " + bidId);
         Object content = socketVO.getContent();
-        System.out.println("PushContent = " + content);
-        redisService.setValuesPush(bidId, (String) content);
+        bidService.setValuesPush(bidId, (String) content);
 
-
-        return new SocketVO(bidId, content);
+        return bidService.getValuesListAll(bidId);
     }
+
+
+
     @MessageMapping("/bid-update")
     @SendTo("/bidList")
     public SocketVO bidLastIndex(SocketVO socketVO){
