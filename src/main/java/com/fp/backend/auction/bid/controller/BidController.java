@@ -37,8 +37,13 @@ public class BidController {
         String bidId = socketVO.getBidId();
         Object content = socketVO.getContent();
         bidService.setValuesPush(bidId, (String) content);
-
         return bidService.getValuesListAll(bidId);
+//        try{
+//            bidService.setValuesPush(bidId, (String) content);
+//            return bidService.getValuesListAll(bidId);
+//        }catch (Exception e){
+//            return bidService.getValuesListAll(bidId);
+//        }
     }
 
 
