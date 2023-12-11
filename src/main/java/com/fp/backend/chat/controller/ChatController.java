@@ -22,7 +22,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("/receive/{chatId}")
-    @SendTo("/chat/{chatId}")
+    @SendTo("/send/{chatId}")
     public MessageDTO sendMessage(MessageDTO dto) {
         return dto;
     }
