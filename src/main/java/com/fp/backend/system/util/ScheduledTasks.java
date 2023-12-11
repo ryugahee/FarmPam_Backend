@@ -17,15 +17,7 @@ public class ScheduledTasks {
 
     ItemService itemService;
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void updateExpiredItems() {
-
-        log.info("경매 마감 시간 업데이트 시작");
-        itemService.updateExpiredItems();
-        log.info("경매 마감 시간 업데이트 종료");
-
-    }
-/*    @Scheduled(fixedRate = 5000)
+/*    @Scheduled(cron = "0 0 0 * * *")
     public void updateExpiredItems() {
 
         log.info("경매 마감 시간 업데이트 시작");
@@ -33,4 +25,12 @@ public class ScheduledTasks {
         log.info("경매 마감 시간 업데이트 종료");
 
     }*/
+    @Scheduled(fixedRate = 5000)
+    public void updateExpiredItems() {
+
+        log.info("경매 마감 시간 업데이트 시작");
+        itemService.updateExpiredItems();
+        log.info("경매 마감 시간 업데이트 종료");
+
+    }
 }

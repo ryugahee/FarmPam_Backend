@@ -34,6 +34,7 @@ public class ItemService {
     private final ItemTagMapService itemTagMapService;
 
     // 경매 등록
+    @Transactional
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception {
 
@@ -65,7 +66,7 @@ public class ItemService {
         return item.getId();
     }
 
-    // 경매 리스트
+    // 경매 검색
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList(int page, String sortType, String keyword) {
 
@@ -74,16 +75,25 @@ public class ItemService {
         System.out.println("타입: " + sortType);
         System.out.println("타입: " + keyword);
 
-        if (keyword != null) {
-            PageRequest pageable = PageRequest.of(page, 7);
-            itemList = this.itemRepository.findByKeywordAndNotSoldOut(keyword, pageable);
-
-//            itemList = itemRepository.findByItemTitle(keyword);
+        //키워드 존재
+        if (keyword != "") {
+            //키워드 + 마감시간
+            if (sortType.equals("time")) {
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByKeywordAndTime(keyword, pageable);
+            } else {
+                //키워드 + 최신
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
+            }
+            //노키워드
         } else {
-            if (sortType != null && sortType.equals("time")) {
+            // 노키워드 + 마감시간
+            if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
             } else {
+                // 노키워드 + 최신
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
             }
@@ -111,6 +121,51 @@ public class ItemService {
 
             System.out.println("시간: " + itemFormDto.getTime());
             System.out.println("솔아: " + itemFormDto.getIsSoldout());
+
+        }
+        return itemFormDtoList;
+    }
+
+    //네브바 검색
+    @Transactional(readOnly = true)
+    public List<ItemFormDto> getItemList(int page, String keyword) {
+
+        Slice<Item> itemList;
+
+        System.out.println("타입: " + keyword);
+
+        //키워드 존재
+        if (keyword != "") {
+            PageRequest pageable = PageRequest.of(page, 7);
+            itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
+            //노키워드
+        } else {
+            PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
+            itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+        }
+
+        System.out.println("아이템갯수: " + itemList.getSize());
+
+        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+        for (Item item : itemList) {
+
+            ItemFormDto itemFormDto = ItemFormDto.of(item);
+
+            List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
+            List<ItemImgDto> itemImgDtoList = new ArrayList<>();
+            for (ItemImg itemImg : itemImgList) {
+                ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
+                itemImgDtoList.add(itemImgDto);
+
+            }
+            itemFormDto.setItemImgDtoList(itemImgDtoList);
+
+            if (!itemFormDto.getIsSoldout()) {
+                itemFormDtoList.add(itemFormDto);
+            }
+
+            System.out.println("네브시간: " + itemFormDto.getTime());
+            System.out.println("네브솔아: " + itemFormDto.getIsSoldout());
 
         }
         return itemFormDtoList;
@@ -167,7 +222,6 @@ public class ItemService {
         return itemDetailFormDto;
 
     }
-
 
     // 스케줄러
     public void updateExpiredItems() {

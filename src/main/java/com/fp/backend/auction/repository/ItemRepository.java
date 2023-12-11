@@ -12,27 +12,34 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
+
+    //종료임박
    Slice<Item> findByIsSoldoutFalseOrderByTime(PageRequest pageable);
+   //최신
     Slice<Item> findByIsSoldoutFalseOrderByIdDesc(PageRequest pageable);
 
+    //스케줄러
     List<Item> findByTimeLessThan(long currentTimeMillis);
 
+    //키워드 + 최신
     @Query("SELECT DISTINCT i FROM Item i " +
             "LEFT JOIN i.itemTagMapList itm " +
             "LEFT JOIN itm.itemTag it " +
             "WHERE (LOWER(i.itemTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(it.tagName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND i.isSoldout = false")
-    Slice<Item> findByKeywordAndNotSoldOut(@Param("keyword") String keyword, PageRequest pageable);
+            "AND i.isSoldout = false " +
+            "ORDER BY i.id DESC")
+    Slice<Item> findByKeywordAndLatest(@Param("keyword") String keyword, PageRequest pageable);
 
-//    @Query("SELECT DISTINCT i FROM Item i " +
-//            "LEFT JOIN i.itemTagMapList itm " +
-//            "LEFT JOIN itm.itemTag it " +
-//            "WHERE i.itemTitle =  :itemTitle "
-//            )
-//    Slice<Item> findByKeywordAndNotSoldOut(@Param("itemTitle") String itemTitle, PageRequest pageable);
-
-//    Slice<Item> findByItemTitle(String keyword);
+    //키워드 + 종료임박
+    @Query("SELECT DISTINCT i FROM Item i " +
+            "LEFT JOIN i.itemTagMapList itm " +
+            "LEFT JOIN itm.itemTag it " +
+            "WHERE (LOWER(i.itemTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(it.tagName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND i.isSoldout = false " +
+            "ORDER BY i.time ASC")
+    Slice<Item> findByKeywordAndTime(@Param("keyword") String keyword, PageRequest pageable);
 
 }
 
