@@ -19,13 +19,16 @@ public class BidService {
     private final RedisTemplate<String, Object> redisTemplate;
     public void setValuesPush(String key, String data){
         ListOperations<String, Object> list = redisTemplate.opsForList();
-//        int currentBidPrice= (int) list.index(key, 0);
-//        System.out.println("currentBidPrice = " + currentBidPrice);
-//        int receiveBidPrice = Integer.parseInt(data);
-//        System.out.println("receiveBidPrice = " + receiveBidPrice);
-//        if ()
-        list.leftPush(key, data);
+        Object currentObject = list.index(key, 0);
+        int current = Integer.parseInt((String) currentObject);
+        System.out.println("currentBidPrice = " + current);
+        int receive = Integer.parseInt(data);
+        System.out.println("receiveBidPrice = " + receive);
+        if (current < receive){
+            list.leftPush(key, data);
+        }
     }
+
     public String getValuesLastIndex(String key){
         ListOperations<String, Object> list = redisTemplate.opsForList();
         return (String) list.index(key, 0);
