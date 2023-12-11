@@ -2,18 +2,17 @@ package com.fp.backend.auction.controller;
 
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
-import com.fp.backend.auction.entity.Item;
+import com.fp.backend.auction.dto.ItemMarketValueDto;
 import com.fp.backend.auction.service.ItemService;
-import com.fp.backend.system.config.redis.RedisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,6 +69,21 @@ public class ItemController {
         System.out.println("경매 디테일 요청: " + id);
         ItemDetailFormDto itemDetail = itemService.getItemDetail(id);
         return new ResponseEntity<>(itemDetail, HttpStatus.OK);
+    }
+
+    //날짜별 품목 시세
+    @PostMapping("/item/marketValue")
+    public ResponseEntity<Map<String, List<?>>> getItemMarketValue(@RequestBody ItemMarketValueDto itemType) {
+
+        System.out.println("시세 컨트롤러 진입");
+
+        System.out.println("키워드 확인 : " + itemType.getItemType());
+
+        Map<String, List<?>> marketValues = itemService.searchMarketValues(itemType.getItemType());
+
+        System.out.println(marketValues);
+
+        return new ResponseEntity<>(marketValues, HttpStatus.OK);
     }
 
 

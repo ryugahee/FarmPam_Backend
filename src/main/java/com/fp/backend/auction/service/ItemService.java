@@ -7,18 +7,20 @@ import com.fp.backend.auction.dto.ItemImgDto;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
 import com.fp.backend.auction.entity.ItemTagMap;
+import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
+import com.fp.backend.auction.repository.MarketValueRepository;
 import com.fp.backend.system.config.redis.RedisService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.System.currentTimeMillis;
@@ -28,12 +30,15 @@ import static java.lang.System.currentTimeMillis;
 @RequiredArgsConstructor
 public class ItemService {
 
+    private final MarketValueRepository marketValueRepository;
     private final ItemRepository itemRepository;
     private final ItemImgRepository itemImgRepository;
     private final ItemTagMapRepository itemTagMapRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
     private final RedisService redisService;
+    private final EntityManager entityManager;
+
     // 경매 등록
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception {
@@ -149,4 +154,53 @@ public class ItemService {
         return itemDetailFormDto;
 
     }
+
+    public Map<String, List<?>> searchMarketValues(String itemType) {
+
+//        List<MarketValue> marketValues = marketValueRepository.findMarketValues(itemType);
+
+        String sql = "SELECT AVG(average_price) AS average_price, DATE_FORMAT(sold_date, '%Y-%m-%d') AS day, item_type\n" +
+                "FROM market_value\n" +
+                "where item_type LIKE :itemType\n" + // :itemType 플레이스홀더
+                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+
+        List<MarketValue> resultList = entityManager.createNativeQuery(sql)
+                .setParameter("itemType", "%" + itemType + "%")
+                .getResultList();
+
+
+        String priceSql = "SELECT AVG(average_price) AS average_price\n" +
+                "FROM market_value\n" +
+                "where item_type LIKE :itemType\n" +
+                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+
+        List<Integer> priceList = entityManager.createNativeQuery(priceSql).setParameter("itemType", "%" + itemType + "%").getResultList();
+
+        String dateSql = "SELECT DATE_FORMAT(sold_date, '%Y-%m-%d') AS day\n" +
+                "FROM market_value\n" +
+                "where item_type LIKE :itemType\n" +
+                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+
+        List<String> dayList = entityManager.createNativeQuery(dateSql).setParameter("itemType", "%" + itemType + "%").getResultList();
+
+        String itemSql = "SELECT item_type\n" +
+                "FROM market_value\n" +
+                "where item_type LIKE :itemType\n" + // :itemType 플레이스홀더
+                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+
+        List<String> itemList = entityManager.createNativeQuery(itemSql).setParameter("itemType", "%" + itemType + "%").getResultList();
+
+        entityManager.close();
+
+        Map<String, List<?>> resultMap = new HashMap<>();
+//        resultMap.put("resultList", resultList);
+        resultMap.put("priceList", priceList);
+        resultMap.put("dayList", dayList);
+        resultMap.put("itemList", itemList);
+
+        return resultMap;
+
+    }
+
+
 }
