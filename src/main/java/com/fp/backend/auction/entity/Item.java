@@ -22,9 +22,6 @@ public class Item extends BaseEntity {
     @Id
     private Long id;
 
-    @Column(nullable = false)
-    private String userName;
-
     @Column(nullable = false, length = 50)
     private String itemTitle;
 
@@ -39,7 +36,7 @@ public class Item extends BaseEntity {
     private long time;
 
     @Column(nullable = false)
-    private String itemType;
+    private String city;
 
     @Column(nullable = false)
     private int weight;
