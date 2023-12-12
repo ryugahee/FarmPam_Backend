@@ -32,4 +32,5 @@ public class ItemImg extends BaseEntity {
         this.imgName = imgName;
         this.imgUrl = imgUrl;
     }
+
 }

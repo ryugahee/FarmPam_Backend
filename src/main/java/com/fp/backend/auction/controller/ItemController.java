@@ -50,7 +50,7 @@ public class ItemController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 리스트 조회
+    // 경매 검색
     @GetMapping("/item/list")
     public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam int page,
                                                          @RequestParam(required = false) String sortType,
@@ -63,6 +63,20 @@ public class ItemController {
 
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
+
+    // 네브바 검색
+    @GetMapping("/nav/item/list")
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam int page,
+                                                         @RequestParam(value = "keyword", required = false) String keyword) {
+
+        if (keyword == null) {
+            keyword = "";
+        }
+        List<ItemFormDto> itemList = itemService.getItemList(page, keyword);
+
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
+
 
     // 경매 삭제
     @DeleteMapping("/item/delete/{itemId}")
@@ -124,4 +138,5 @@ public class ItemController {
         return new ResponseEntity<>(sellerId, HttpStatus.OK);
     }
 }
+
 

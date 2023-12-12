@@ -20,7 +20,7 @@ public class ItemDetailFormDto {
 
     private long time;
 
-    private String itemType;
+    private String city;
 
     private int weight;
 
@@ -36,18 +36,17 @@ public class ItemDetailFormDto {
         ItemDetailFormDto itemDetailFormDto = modelMapper.map(item, ItemDetailFormDto.class);
 
         // 남은 경매 시간
-        long currentTimeMillis = System.currentTimeMillis();
-        long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
-        if (elapsedTimeInMillis > 0) {
-            itemDetailFormDto.setTime(elapsedTimeInMillis);
-            System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = item.getTime() - currentTime;
+        if (elapsedTime > 0) {
+            itemDetailFormDto.setTime(elapsedTime);
+            System.out.println("경매마감시간-현재시간: " + elapsedTime);
         } else {
-            itemDetailFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+            itemDetailFormDto.setTime(0);
+            itemDetailFormDto.setIsSoldout(true);
         }
 
         return itemDetailFormDto;
     }
 
-
-    // 추가할 것 - 작성자 프로필사진, 닉네임, 별점
 }

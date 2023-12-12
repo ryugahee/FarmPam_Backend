@@ -54,6 +54,7 @@ public class ItemService {
 
 
     // 경매 등록
+    @Transactional
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception {
 
@@ -62,8 +63,9 @@ public class ItemService {
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
 
-        item.setTime(updatedTime);
 
+
+        item.setTime(updatedTime);
         item.setIsSoldout(false);
 
         Users users = userRepository.findById(itemFormDto.getUserId())
@@ -88,7 +90,7 @@ public class ItemService {
 
 
         String Id = String.valueOf(item.getId());
-        String userName = (item.getUserName());
+        String userName = (users.getUsername());
         System.out.println("userName = " + userName);
         String minPrice = String.valueOf((item.getMinPrice()));
         System.out.println("minPrice = " + minPrice);
@@ -103,7 +105,7 @@ public class ItemService {
         return item.getId();
     }
 
-    // 경매 리스트
+    // 경매 검색
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList(int page, String sortType, String keyword) {
 
@@ -112,12 +114,18 @@ public class ItemService {
         System.out.println("타입: " + sortType);
         System.out.println("타입: " + keyword);
 
-        if (keyword != "") {
-            PageRequest pageable = PageRequest.of(page, 7);
-            itemList = this.itemRepository.findByKeywordAndNotSoldOut(keyword, pageable);
 
+        if (keyword != "") {
+
+            if (sortType.equals("time")) {
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByKeywordAndTime(keyword, pageable);
+            } else {
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
+            }
         } else {
-            if (sortType != null && sortType.equals("time")) {
+            if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
             } else {
@@ -126,7 +134,45 @@ public class ItemService {
             }
         }
 
-        System.out.println("아이템갯수: " + itemList.getSize());
+        List<ItemFormDto> itemFormDtoList = new ArrayList<>();
+        for (Item item : itemList) {
+            ItemFormDto itemFormDto = ItemFormDto.of(item);
+
+            List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
+            List<ItemImgDto> itemImgDtoList = new ArrayList<>();
+            for (ItemImg itemImg : itemImgList) {
+                ItemImgDto itemImgDto = ItemImgDto.of(itemImg);
+                itemImgDtoList.add(itemImgDto);
+
+            }
+            itemFormDto.setItemImgDtoList(itemImgDtoList);
+
+            if (!itemFormDto.getIsSoldout()) {
+            itemFormDtoList.add(itemFormDto);
+            }
+
+            System.out.println("시간: " + itemFormDto.getTime());
+            System.out.println("솔아: " + itemFormDto.getIsSoldout());
+
+        }
+        return itemFormDtoList;
+    }
+
+    //네브바 검색
+    @Transactional(readOnly = true)
+    public List<ItemFormDto> getItemList(int page, String keyword) {
+
+        Slice<Item> itemList;
+
+        System.out.println("타입: " + keyword);
+
+        if (keyword != "") {
+            PageRequest pageable = PageRequest.of(page, 7);
+            itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
+        } else {
+            PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
+            itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+        }
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
@@ -145,9 +191,6 @@ public class ItemService {
             if (!itemFormDto.getIsSoldout()) {
                 itemFormDtoList.add(itemFormDto);
             }
-
-            System.out.println("시간: " + itemFormDto.getTime());
-            System.out.println("솔아: " + itemFormDto.getIsSoldout());
 
         }
         return itemFormDtoList;
