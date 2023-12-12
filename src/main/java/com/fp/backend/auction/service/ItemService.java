@@ -1,6 +1,7 @@
 package com.fp.backend.auction.service;
 
 
+import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.dto.ItemImgDto;
@@ -11,6 +12,7 @@ import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
 import com.fp.backend.system.config.redis.RedisService;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class ItemService {
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
     private final RedisService redisService;
+    private final Gson gson;
     // 경매 등록
     public Long saveItem(ItemFormDto itemFormDto,
                          List<MultipartFile> itemImgFileList) throws Exception {
@@ -63,8 +66,21 @@ public class ItemService {
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
 
         String Id = String.valueOf(item.getId());
-        String minPrice = String.valueOf(item.getMinPrice());
-        redisService.setValuesPush(Id, minPrice);
+        String userName = (item.getUserName());
+        System.out.println("userName = " + userName);
+        String minPrice = String.valueOf((item.getMinPrice()));
+        System.out.println("minPrice = " + minPrice);
+//        List<String> bidData = new ArrayList<>();
+//
+//        bidData.add(userName);
+//        bidData.add(minPrice);
+        BidData bidData = new BidData(userName, minPrice);
+
+        String data = gson.toJson(bidData);
+
+        System.out.println("Register Data = " + data);
+
+        redisService.setValuesPush(Id, data);
 
         return item.getId();
     }
