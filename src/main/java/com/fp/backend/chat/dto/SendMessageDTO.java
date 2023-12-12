@@ -1,10 +1,10 @@
 package com.fp.backend.chat.dto;
 
-import com.fp.backend.chat.domain.Message;
+import com.fp.backend.chat.domain.ChatMessage;
 import lombok.Data;
 
 @Data
 public class SendMessageDTO {
-    private Message message;
+    private ChatMessage chatMessage;
     private Long chatId;
 }

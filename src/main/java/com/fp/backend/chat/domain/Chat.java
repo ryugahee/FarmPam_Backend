@@ -1,17 +1,14 @@
 package com.fp.backend.chat.domain;
 
-import jakarta.persistence.Column;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -30,7 +27,7 @@ public class Chat {
 
     private String secondUserId;
 
-    private List<Message> messages = new ArrayList<>();
+    private final List<ChatMessage> chatMessages = new ArrayList<>();
 
     private String createdAt;
 
@@ -45,7 +42,7 @@ public class Chat {
         this.itemId = itemId;
     }
 
-    public void addMessage(Message message) {
-        this.messages.add(message);
+    public void addMessage(ChatMessage chatMessage) {
+        this.chatMessages.add(chatMessage);
     }
 }

@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -16,6 +17,8 @@ import com.querydsl.core.types.Path;
 public class QItem extends EntityPathBase<Item> {
 
     private static final long serialVersionUID = 1662596034L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QItem item = new QItem("item");
 
@@ -30,6 +33,8 @@ public class QItem extends EntityPathBase<Item> {
 
     public final StringPath itemDetail = createString("itemDetail");
 
+    public final ListPath<ItemTagMap, QItemTagMap> itemTagMapList = this.<ItemTagMap, QItemTagMap>createList("itemTagMapList", ItemTagMap.class, QItemTagMap.class, PathInits.DIRECT2);
+
     public final StringPath itemTitle = createString("itemTitle");
 
     public final StringPath itemType = createString("itemType");
@@ -41,18 +46,29 @@ public class QItem extends EntityPathBase<Item> {
 
     public final NumberPath<Long> time = createNumber("time", Long.class);
 
+    public final com.fp.backend.account.entity.QUsers users;
+
     public final NumberPath<Integer> weight = createNumber("weight", Integer.class);
 
     public QItem(String variable) {
-        super(Item.class, forVariable(variable));
+        this(Item.class, forVariable(variable), INITS);
     }
 
     public QItem(Path<? extends Item> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QItem(PathMetadata metadata) {
-        super(Item.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QItem(PathMetadata metadata, PathInits inits) {
+        this(Item.class, metadata, inits);
+    }
+
+    public QItem(Class<? extends Item> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.users = inits.isInitialized("users") ? new com.fp.backend.account.entity.QUsers(forProperty("users")) : null;
     }
 
 }

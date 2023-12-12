@@ -35,8 +35,6 @@ public class QUsers extends EntityPathBase<Users> {
 
     public final StringPath password = createString("password");
 
-    public final StringPath phoneNumber = createString("phoneNumber");
-
     public final StringPath realName = createString("realName");
 
     public final StringPath streetAddress = createString("streetAddress");
