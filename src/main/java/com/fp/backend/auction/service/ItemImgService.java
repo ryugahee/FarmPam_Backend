@@ -1,7 +1,6 @@
 package com.fp.backend.auction.service;
 
 
-import com.fp.backend.controller.FileS3UploadController;
 import com.fp.backend.auction.entity.ItemImg;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.controller.FileS3UploadController;

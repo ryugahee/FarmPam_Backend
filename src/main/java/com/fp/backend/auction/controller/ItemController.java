@@ -2,10 +2,17 @@ package com.fp.backend.auction.controller;
 
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
+
 import com.fp.backend.auction.dto.ItemMarketValueDto;
 import com.fp.backend.auction.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import com.fp.backend.auction.service.ItemService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j
 public class ItemController {
 
     private final ItemService itemService;
@@ -25,28 +33,34 @@ public class ItemController {
     @PostMapping("/item/new")
     public ResponseEntity<String> itemNew(@Valid ItemFormDto itemFormDto,
                                           @RequestParam("files") List<MultipartFile> itemImgFileList) {
+        if (itemImgFileList.size() > 5) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지는 최대 5개까지 업로드 가능합니다.");
+        }
 
-        
         if (itemImgFileList.get(0).isEmpty() && itemFormDto.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첫번째 상품 이미지는 필수 입력 값입니다.");
         }
         try {
             itemService.saveItem(itemFormDto, itemImgFileList);
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("상품 등록 중 에러가 발생했습니다.");
         }
 
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 최신순 리스트
+    // 리스트 조회
     @GetMapping("/item/list")
-    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam("num") Long num) {
-        System.out.println("최신 리스트 요청: " + num);
-        List<ItemFormDto> itemList = itemService.getItemList(num);
+    public ResponseEntity<List<ItemFormDto>> getItemList(@RequestParam int page,
+                                                         @RequestParam(required = false) String sortType,
+                                                         @RequestParam(value = "keyword", required = false) String keyword) {
+
+        if (keyword == null) {
+            keyword = "";
+        }
+        List<ItemFormDto> itemList = itemService.getItemList(page, sortType, keyword);
+
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
@@ -61,7 +75,8 @@ public class ItemController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    };
+    }
+
 
     // 경매 디테일
     @GetMapping("/item/detail/{id}")
@@ -70,6 +85,7 @@ public class ItemController {
         ItemDetailFormDto itemDetail = itemService.getItemDetail(id);
         return new ResponseEntity<>(itemDetail, HttpStatus.OK);
     }
+
 
     //날짜별 품목 시세
     @PostMapping("/item/marketValue")
@@ -98,4 +114,14 @@ public class ItemController {
     }
 
 
+    @GetMapping("/item/detail/{id}/seller")
+    public ResponseEntity<String> getSellerId(@PathVariable Long id) {
+        log.info("getSellerId {}", id);
+
+        String sellerId = itemService.getSellerId(id);
+
+
+        return new ResponseEntity<>(sellerId, HttpStatus.OK);
+    }
 }
+

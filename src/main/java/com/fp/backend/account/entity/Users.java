@@ -4,24 +4,19 @@ import com.fp.backend.account.common.AuthorityName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
+@ToString
 @Entity
 public class Users implements UserDetails, OAuth2User {
 
@@ -32,19 +27,15 @@ public class Users implements UserDetails, OAuth2User {
     @Column(length = 100, nullable = false)
     private String password;
 
+    private boolean enabled;
+
     private String realName;
 
     private String nickname;
 
-    private boolean enabled;
-
     private Integer age;
 
     private String email;
-
-    private String phoneNumber;
-
-    private String imageUrl;
 
     private String mailCode;
 
@@ -52,21 +43,42 @@ public class Users implements UserDetails, OAuth2User {
 
     private String detailAddress;
 
+    private String imageUrl;
 
-//    private String refreshToken;
 
+    @Override
+    public <A> A getAttribute(String name) {
+        if (name.equals("GUEST")) {
+            return OAuth2User.super.getAttribute("ROLE_GUEST");
+        } else {
+            return OAuth2User.super.getAttribute("ROLE_USER");
+        }
+
+    }
 
     //간편로그인
     @Override
     public Map<String, Object> getAttributes() {
-        return null;
+        Map<String, Object> attributes = new HashMap<>();
+
+        // 권한을 추가하고 싶은 경우
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(AuthorityName.GUEST.getKey())); // ROLE_GUEST
+        // 다른 권한을 추가할 수 있음
+
+        // Map에 "authorities" 키에 권한 정보를 추가
+        attributes.put("authorities", authorities);
+
+        // 다른 속성들을 추가할 수 있음
+
+        return attributes;
     }
 
     //일반 로그인
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(AuthorityName.USER.getKey())); // ROLE_USER
+        authorities.add(new SimpleGrantedAuthority(AuthorityName.GUEST.getKey())); // ROLE_USER
         // 다른 권한을 추가할 수 있음
 
         return authorities;

@@ -44,20 +44,66 @@ public class TokenProvider  implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(Authentication authentication) {
+
+
+    //액세스 토큰 생성
+//    public String createAccessToken(Authentication authentication) {
+//
+//        String authorities = authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.joining(","));
+//
+//        long now = (new Date()).getTime();
+//        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
+//
+//        return Jwts.builder()
+//                .setSubject(authentication.getName())
+//                .claim(AUTHORITIES_KEY, authorities)
+//                .signWith(key, SignatureAlgorithm.HS512)
+//                .setExpiration(validity)
+//                .compact();
+//
+//    }
+
+    public String createAccessToken() {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
+
+        return Jwts.builder()
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+
+    }
+
+    //리프레시 토큰 생성
+    public String createRefreshToken(Authentication authentication) {
+
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject("AccessToken")
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validity)
+                .setExpiration(new Date(now + 86400000))
                 .compact();
+
+    }
+
+    public String createRefreshToken() {
+
+        long now = (new Date()).getTime();
+
+        return Jwts.builder()
+                .setSubject("RefreshToken")
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(new Date(now + 86400000))
+                .compact();
+
     }
 
     //엑세스 토큰 생성
@@ -100,21 +146,40 @@ public class TokenProvider  implements InitializingBean {
                 .map(refreshToken -> refreshToken.replace("Bearer ", ""));
     }
 
+    //헤더에서 엑세스토큰 꺼내기
+    public Optional<String> extractAccessToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader("Authorization"))
+                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
+                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
+    }
+
+    //헤더에서 리프레시토큰 꺼내기
+    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader("AuthorizationRefresh"))
+                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
+                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
+    }
+
+    //토큰 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             logger.info("잘못된 JWT 서명입니다.");
+            return false;
         } catch (ExpiredJwtException e) {
             logger.info("만료된 JWT 토큰입니다.");
+            return false;
         } catch (UnsupportedJwtException e) {
             logger.info("지원되지 않는 JWT 토큰입니다.");
+            return false;
         } catch (IllegalArgumentException e) {
             logger.info("JWT 토큰이 잘못되었습니다.");
+            return false;
         }
-        return false;
     }
+
 
 //    public Authentication getAuthentication(String token) {
 //        Claims claims = Jwts
@@ -137,3 +202,4 @@ public class TokenProvider  implements InitializingBean {
 
 
 }
+

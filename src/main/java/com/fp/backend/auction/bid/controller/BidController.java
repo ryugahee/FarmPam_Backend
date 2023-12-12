@@ -1,6 +1,7 @@
 package com.fp.backend.auction.bid.controller;
 
 
+import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.service.BidService;
 import com.fp.backend.system.config.websocket.SocketVO;
 
@@ -9,10 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Controller
@@ -28,15 +26,25 @@ public class BidController {
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
         String bidId = socketVO.getBidId();
+        System.out.println("bidId = " + bidId);
         return bidService.getValuesListAll(bidId);
+    }
+    @PostMapping("/bid-finish/{itemId}")
+    public void bidFinish(@PathVariable("itemId") Long id){
+        Object lastBid = bidService.getValuesLastIndex(String.valueOf(id));
+        System.out.println("lastBid = " + lastBid);
     }
 
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
     public Object bidPush(@Payload SocketVO socketVO){
         String bidId = socketVO.getBidId();
+        System.out.println("bidId = " + bidId);
         Object content = socketVO.getContent();
-        bidService.setValuesPush(bidId, (String) content);
+        System.out.println("content = " + content);
+
+
+        bidService.setValuesPush(bidId, content);
         return bidService.getValuesListAll(bidId);
 //        try{
 //            bidService.setValuesPush(bidId, (String) content);
@@ -47,17 +55,17 @@ public class BidController {
     }
 
 
-
-    @MessageMapping("/bid-update")
-    @SendTo("/bidList")
-    public SocketVO bidLastIndex(SocketVO socketVO){
-        String bidId = socketVO.getBidId();
-        System.out.println("IndexName = " + bidId);
-        Object content = socketVO.getContent();
-        System.out.println("IndexContent = " + content);
-        System.out.println("bidID = " + socketVO.getBidId());
-        return new SocketVO(bidId, content);
-    }
+//
+//    @MessageMapping("/bid-update")
+//    @SendTo("/bidList")
+//    public SocketVO bidLastIndex(SocketVO socketVO){
+//        String bidId = socketVO.getBidId();
+//        System.out.println("IndexName = " + bidId);
+//        Object content = socketVO.getContent();
+//        System.out.println("IndexContent = " + content);
+//        System.out.println("bidID = " + socketVO.getBidId());
+//        return new SocketVO(bidId, content);
+//    }
 //    @MessageMapping("/bid-List")
 //    @SendTo("/bidList")
 //    public List<Object> bidList(String bidId){

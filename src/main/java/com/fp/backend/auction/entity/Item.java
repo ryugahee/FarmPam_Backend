@@ -1,9 +1,13 @@
 package com.fp.backend.auction.entity;
 
+import com.fp.backend.account.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -17,6 +21,9 @@ public class Item extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private Long id;
+
+    @Column(nullable = false)
+    private String userName;
 
     @Column(nullable = false, length = 50)
     private String itemTitle;
@@ -39,5 +46,12 @@ public class Item extends BaseEntity {
 
     @Column
     private Boolean isSoldout;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemTagMap> itemTagMapList = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "username")
+    private Users users;
 
 }

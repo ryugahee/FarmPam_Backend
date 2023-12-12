@@ -1,6 +1,7 @@
 package com.fp.backend.account.service;
 
 import com.fp.backend.account.common.AuthorityName;
+
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
 import com.fp.backend.account.entity.Authorities;
@@ -10,6 +11,7 @@ import com.fp.backend.account.repository.AuthoritiesRepository;
 import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.account.sms.SmsUtil;
 import com.fp.backend.system.config.redis.RedisService;
+
 import com.fp.backend.system.jwt.TokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +27,13 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.*;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
@@ -63,6 +67,7 @@ public class UserService {
 
 
             return ResponseEntity.ok().body("가입 성공");
+
         }
         return ResponseEntity.badRequest().body("가입 실패");
     }
@@ -178,6 +183,5 @@ public class UserService {
         return "";
 
     }
-
 
 }

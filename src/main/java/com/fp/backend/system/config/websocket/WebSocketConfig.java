@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
-        registry.enableSimpleBroker("/bidList", "/bidPrice", "/chat");
+        registry.enableSimpleBroker("/bidList", "/bidPrice", "/send");
     }
 
     @Override
@@ -20,8 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/bid")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
-//        registry.addEndpoint("/chat")
-//                .setAllowedOriginPatterns("*")
-//                .withSockJS();
+        registry.addEndpoint("/chat")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

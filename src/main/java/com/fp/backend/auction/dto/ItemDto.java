@@ -8,6 +8,8 @@ import lombok.Setter;
 public class ItemDto {
     private Long id;
 
+    private String userName;
+
     private String itemTitle;
 
     private int minPrice;

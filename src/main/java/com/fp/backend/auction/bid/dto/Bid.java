@@ -1,5 +1,7 @@
 package com.fp.backend.auction.bid.dto;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,13 +12,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Bid {
-    private String bidId;
-    private String bidName;
+    @SerializedName("userName")
+    @Expose
+    private String userName;
+    @SerializedName("bidPrice")
+    @Expose
+    private String bidPrice;
 
-    public static Bid create(String name){
-        Bid bid = new Bid();
-        bid.bidId = UUID.randomUUID().toString();
-        bid.bidName = name;
-        return bid;
+    public Bid(String userName, String bidPrice){
+        this.userName = userName;
+        this.bidPrice = bidPrice;
     }
 }

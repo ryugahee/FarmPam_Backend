@@ -1,12 +1,13 @@
 package com.fp.backend.chat.service;
 
+import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.chat.domain.Chat;
-import com.fp.backend.chat.domain.Message;
+import com.fp.backend.chat.domain.ChatMessage;
 import com.fp.backend.chat.dto.ChatDetailInfoDTO;
 import com.fp.backend.chat.dto.ChatPreviewInfoDTO;
 import com.fp.backend.chat.dto.NewChatInfoDTO;
@@ -45,6 +46,8 @@ public class ChatServiceImpl implements ChatService {
     public List<ChatPreviewInfoDTO> getChatPreviewInfos(List<Long> chatIds, String userId) {
 
         log.info("채팅방 미리보기 정보 가져오기: getChatPreviewInfos");
+        log.info("채팅 번호 {}", chatIds.toString());
+        log.info("유저 아이디 {}", userId);
 
         List<ChatPreviewInfoDTO> result = new ArrayList<>();
 
@@ -59,9 +62,8 @@ public class ChatServiceImpl implements ChatService {
             // 상대방 찾기
             String receiverId = getReceiverId(chat, userId);
 
-            // TODO: User Entity 작업 완료 시 아래 주석 풀 것
-//            Users receiver = userRepository.findById(receiverId)
-//                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
+            Users receiver = userRepository.findById(receiverId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
 
             // 경매 정보 찾기
             Item item = itemRepository.findById(chat.getItemId())
@@ -73,25 +75,38 @@ public class ChatServiceImpl implements ChatService {
                     .stream().findFirst()
                     .orElseThrow(() -> new RuntimeException("경매 이미지가 존재하지 않습니다."));
 
+            log.info("{}", itemImg.getImgUrl());
+
 
             // 마지막 메시지 가져오기
-            List<Message> messages = chat.getMessages();
-            Message message = messages.get(messages.size() - 1);
+            List<ChatMessage> chatMessages = chat.getChatMessages();
 
+            ChatMessage chatLastMessage = getLastChatMessage(chatMessages);
 
-            // TODO: User Entity 작업 완료 시 아래 주석 풀 것
             result.add(ChatPreviewInfoDTO.builder()
-//                    .toNickName(receiver.getNickname())
-//                    .toNickNameThumbnailUrl(receiver.getImageUrl())
-                    .toNickName("테스트 아이디") // FIXME: 테스트용 지울 것
-                    .toNickNameThumbnailUrl("../../public/assets/img/profile1.png")
-                    .lastMessage(message.getMessage())
-                    .updateTime(message.getUpdatedAt())
+                    .toNickName(receiver.getNickname())
+                    .toNickNameThumbnailUrl(receiver.getImageUrl())
+                    .lastMessage(chatLastMessage.getMessage())
+                    .updateTime(chatLastMessage.getUpdatedAt())
                     .itemThumbnailUrl(itemImg.getImgUrl())
                     .build());
         }
 
         return result;
+    }
+
+    private static ChatMessage getLastChatMessage(List<ChatMessage> chatMessages) {
+        if (hasNotMessage(chatMessages)) {
+            return ChatMessage.builder()
+                    .message("")
+                    .updatedAt("")
+                    .build();
+        }
+        return chatMessages.get(chatMessages.size() - 1);
+    }
+
+    private static boolean hasNotMessage(List<ChatMessage> chatMessages) {
+        return chatMessages.isEmpty();
     }
 
     @Override
@@ -101,14 +116,12 @@ public class ChatServiceImpl implements ChatService {
 
         Chat chat = getChat(chatId);
 
-        // TODO: 상대방 아이디를 찾은 후 상대방 닉네임 가져오기
         // TODO: itemId 로 타이틀, 썸네일, 경매 현재가(실시간 성 필요)
 
         String receiverId = getReceiverId(chat, userId);
 
-        // TODO: User Entity 작업 완료 시 아래 주석 풀 것
-//            Users receiver = userRepository.findById(receiverId)
-//                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
+        Users receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
 
         // 경매 정보 찾기
         Item item = itemRepository.findById(chat.getItemId())
@@ -121,21 +134,27 @@ public class ChatServiceImpl implements ChatService {
         // TODO: 경매 현재 입찰가 구현
 
         return ChatDetailInfoDTO.builder()
-        //                    .toNickName(receiver.getNickname())
-                .toNickName("테스트 아이디") // FIXME: 구현이 완료되면 지울 것
+                .toNickName(receiver.getNickname())
+
                 .itemTitle(item.getItemTitle())
                 .itemThumbnailUrl(itemImg.getImgUrl())
-                .biddingPrice(10000L)
+                .biddingPrice(10000L) // 경매 현재 입찰가
                 .build();
     }
 
     @Override
-    public List<Message> getChatMessages(Long chatId) {
+    public List<ChatMessage> getChatMessages(Long chatId) {
 
         log.info("채팅 메시지 가져오기: getChatMessages");
 
         Chat chat = getChat(chatId);
-        return chat.getMessages();
+        if (hasNotMessage(chat.getChatMessages())) {
+            chat.addMessage(ChatMessage.builder()
+                    .message("")
+                    .updatedAt("")
+                    .build());
+        }
+        return chat.getChatMessages();
     }
 
     @Override
@@ -144,8 +163,10 @@ public class ChatServiceImpl implements ChatService {
 
         log.info("채팅 메시지 보내기: sendMessage");
 
+        log.info("{}", dto);
+
         Chat chat = getChat(dto.getChatId());
-        chat.addMessage(dto.getMessage());
+        chat.addMessage(dto.getChatMessage());
 
         chatRepository.save(chat);
     }
@@ -153,6 +174,10 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public Long createChat(NewChatInfoDTO dto) {
+        Chat oldChat = chatRepository.findByFirstUserIdOrSecondUserIdAndItemId(dto.getFirstUserId(), dto.getItemId());
+        if (hasChat(oldChat)) {
+            return oldChat.getChatId();
+        }
 
         log.info("채팅방 생성: createChat");
 
@@ -160,6 +185,10 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = dtoToEntity(dto, newChatId);
         chatRepository.save(chat);
         return newChatId;
+    }
+
+    private static boolean hasChat(Chat oldChat) {
+        return !Objects.isNull(oldChat);
     }
 
     private Chat getChat(Long chatId) {

@@ -1,6 +1,10 @@
 package com.fp.backend.auction.service;
 
 
+
+import com.fp.backend.auction.bid.dto.BidData;
+import com.fp.backend.account.entity.Users;
+import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.dto.ItemImgDto;
@@ -13,7 +17,11 @@ import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
 import com.fp.backend.auction.repository.MarketValueRepository;
 import com.fp.backend.system.config.redis.RedisService;
+
 import jakarta.persistence.EntityManager;
+
+import com.google.gson.Gson;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -37,7 +45,13 @@ public class ItemService {
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
     private final RedisService redisService;
+
     private final EntityManager entityManager;
+
+    private final Gson gson;
+
+    private final UserRepository userRepository;
+
 
     // 경매 등록
     public Long saveItem(ItemFormDto itemFormDto,
@@ -47,9 +61,14 @@ public class ItemService {
         Item item = itemFormDto.createItem();
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
+
         item.setTime(updatedTime);
 
         item.setIsSoldout(false);
+
+        Users users = userRepository.findById(itemFormDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않은 유저입니다."));
+        item.setUsers(users);
 
         itemRepository.save(item);
 
@@ -67,26 +86,51 @@ public class ItemService {
         // 태그 등록
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
 
+
         String Id = String.valueOf(item.getId());
-        String minPrice = String.valueOf(item.getMinPrice());
-        redisService.setValuesPush(Id, minPrice);
+        String userName = (item.getUserName());
+        System.out.println("userName = " + userName);
+        String minPrice = String.valueOf((item.getMinPrice()));
+        System.out.println("minPrice = " + minPrice);
+        BidData bidData = new BidData(userName, minPrice);
+
+        String data = gson.toJson(bidData);
+
+        System.out.println("Register Data = " + data);
+
+        redisService.setValuesPush(Id, data);
 
         return item.getId();
     }
 
-
-    // 경매 최신 리스트
+    // 경매 리스트
     @Transactional(readOnly = true)
-    public List<ItemFormDto> getItemList(Long num) {
+    public List<ItemFormDto> getItemList(int page, String sortType, String keyword) {
 
-        Slice<Item> itemList = (num == 1) ?
-                this.itemRepository.findByIsSoldoutFalseAndIdOrderByIdDesc(num) :
-                this.itemRepository.findByIsSoldoutFalseAndIdLessThanOrderByIdDesc(num);
+        Slice<Item> itemList;
+
+        System.out.println("타입: " + sortType);
+        System.out.println("타입: " + keyword);
+
+        if (keyword != "") {
+            PageRequest pageable = PageRequest.of(page, 7);
+            itemList = this.itemRepository.findByKeywordAndNotSoldOut(keyword, pageable);
+
+        } else {
+            if (sortType != null && sortType.equals("time")) {
+                PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
+                itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+            } else {
+                PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
+                itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
+            }
+        }
+
         System.out.println("아이템갯수: " + itemList.getSize());
-
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
+
             ItemFormDto itemFormDto = ItemFormDto.of(item);
 
             List<ItemImg> itemImgList = itemImgRepository.findByItemAndRepImgYn(item, "Y");
@@ -98,7 +142,13 @@ public class ItemService {
             }
             itemFormDto.setItemImgDtoList(itemImgDtoList);
 
-            itemFormDtoList.add(itemFormDto);
+            if (!itemFormDto.getIsSoldout()) {
+                itemFormDtoList.add(itemFormDto);
+            }
+
+            System.out.println("시간: " + itemFormDto.getTime());
+            System.out.println("솔아: " + itemFormDto.getIsSoldout());
+
         }
         return itemFormDtoList;
     }
@@ -154,6 +204,7 @@ public class ItemService {
         return itemDetailFormDto;
 
     }
+
 
     //시세 검색
     public Map<String, List<?>> searchMarketValues(String itemType) {
@@ -244,5 +295,27 @@ public class ItemService {
         return resultMap;
     }
 
+    // 스케줄러
+    public void updateExpiredItems() {
+        long currentTimeMillis = System.currentTimeMillis();
+        List<Item> expiredItems = itemRepository.findByTimeLessThan(currentTimeMillis);
+
+        System.out.println("현재시간: " + currentTimeMillis());
+
+        for (Item item : expiredItems) {
+            if (item.getTime() < System.currentTimeMillis()) {
+                item.setTime(0);
+                item.setIsSoldout(true);
+            }
+        }
+        itemRepository.saveAll(expiredItems);
+    }
+
+    public String getSellerId(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않은 경매 입니다."));
+
+        return item.getUsers().getUsername();
+    }
 
 }

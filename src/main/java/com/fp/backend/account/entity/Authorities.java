@@ -25,3 +25,4 @@ public class Authorities {
     private String username;
 
 }
+

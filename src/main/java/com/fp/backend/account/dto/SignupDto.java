@@ -1,8 +1,12 @@
 package com.fp.backend.account.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SignupDto {
 
     private String username;
@@ -29,3 +33,4 @@ public class SignupDto {
         this.email = email;
     }
 }
+

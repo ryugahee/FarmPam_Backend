@@ -2,10 +2,9 @@ package com.fp.backend.account.dto;
 
 import lombok.*;
 
-@Getter
+@Data
 public class LoginDto {
 
     String username;
     String password;
-    String uuid;
 }
