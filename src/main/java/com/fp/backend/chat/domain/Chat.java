@@ -1,9 +1,6 @@
 package com.fp.backend.chat.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,17 +24,18 @@ public class Chat {
 
     private String secondUserId;
 
-    private final List<ChatMessage> chatMessages = new ArrayList<>();
+    private List<ChatMessage> chatMessages;
 
     private String createdAt;
 
     private Long itemId;
 
     @Builder
-    public Chat(Long chatId, String firstUserId, String secondUserId, String createdAt, Long itemId) {
+    public Chat(Long chatId, String firstUserId, String secondUserId, List<ChatMessage> chatMessages, String createdAt, Long itemId) {
         this.chatId = chatId;
         this.firstUserId = firstUserId;
         this.secondUserId = secondUserId;
+        this.chatMessages = chatMessages;
         this.createdAt = createdAt;
         this.itemId = itemId;
     }
