@@ -9,7 +9,9 @@ import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
 
 import com.fp.backend.account.service.UserService;
-import com.fp.backend.account.util.SmsUtil;
+
+import com.fp.backend.account.sms.SmsUtil;
+import com.fp.backend.system.config.redis.RedisService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,7 +39,7 @@ public class MemberController {
     private final UserService userService;
 
     //NoSQL
-    private final RedisUserService redisUsersService;
+    private final RedisService redisUsersService;
 
 
     @PostMapping("/user/signup")
