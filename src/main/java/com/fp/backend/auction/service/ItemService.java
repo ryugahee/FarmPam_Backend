@@ -155,14 +155,18 @@ public class ItemService {
 
     }
 
+    //시세 검색
     public Map<String, List<?>> searchMarketValues(String itemType) {
+
+        String defaultSql = "FROM market_value\n" +
+                "where item_type LIKE :itemType\n" +
+                "AND sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE() \n" +
+                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
 
 //        List<MarketValue> marketValues = marketValueRepository.findMarketValues(itemType);
 
         String sql = "SELECT AVG(average_price) AS average_price, DATE_FORMAT(sold_date, '%Y-%m-%d') AS day, item_type\n" +
-                "FROM market_value\n" +
-                "where item_type LIKE :itemType\n" + // :itemType 플레이스홀더
-                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+                defaultSql;
 
         List<MarketValue> resultList = entityManager.createNativeQuery(sql)
                 .setParameter("itemType", "%" + itemType + "%")
@@ -170,23 +174,20 @@ public class ItemService {
 
 
         String priceSql = "SELECT AVG(average_price) AS average_price\n" +
-                "FROM market_value\n" +
-                "where item_type LIKE :itemType\n" +
-                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+                defaultSql;
+
 
         List<Integer> priceList = entityManager.createNativeQuery(priceSql).setParameter("itemType", "%" + itemType + "%").getResultList();
 
         String dateSql = "SELECT DATE_FORMAT(sold_date, '%Y-%m-%d') AS day\n" +
-                "FROM market_value\n" +
-                "where item_type LIKE :itemType\n" +
-                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+                defaultSql;
+
 
         List<String> dayList = entityManager.createNativeQuery(dateSql).setParameter("itemType", "%" + itemType + "%").getResultList();
 
         String itemSql = "SELECT item_type\n" +
-                "FROM market_value\n" +
-                "where item_type LIKE :itemType\n" + // :itemType 플레이스홀더
-                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+                defaultSql;
+
 
         List<String> itemList = entityManager.createNativeQuery(itemSql).setParameter("itemType", "%" + itemType + "%").getResultList();
 
@@ -200,6 +201,47 @@ public class ItemService {
 
         return resultMap;
 
+    }
+
+    public Map<String, List<?>> getAllMarketValues() {
+
+        String sql = "SELECT \n" +
+                "  item_type,\n" +
+                "  GROUP_CONCAT(average_price ORDER BY sold_date SEPARATOR ',') AS prices,\n" +
+                "  GROUP_CONCAT(sold_date ORDER BY sold_date SEPARATOR ',') AS dates\n" +
+                "FROM (\n" +
+                "  SELECT \n" +
+                "    item_type,\n" +
+                "    AVG(average_price) AS average_price,\n" +
+                "    DATE(sold_date) AS sold_date\n" +
+                "  FROM market_value\n" +
+                "  WHERE sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()\n" +
+                "  GROUP BY item_type, DATE(sold_date)\n" +
+                ") AS avg_prices\n" +
+                "GROUP BY item_type;";
+
+        List<Object[]> values = entityManager.createNativeQuery(sql).getResultList();
+
+        // 데이터 처리를 위한 Map 생성
+        Map<String, List<?>> resultMap = new HashMap<>();
+
+        // 각 item_type에 대한 결과를 Map에 추가
+        for (Object[] row : values) {
+            String itemType = (String) row[0];
+            String[] averagePrices = ((String) row[1]).split(","); // 평균 가격들을 배열로 분리
+            String[] soldDates = ((String) row[2]).split(","); // 판매 일자들을 배열로 분리
+
+            List<String> averagePriceList = Arrays.asList(averagePrices);
+            List<String> soldDateList = Arrays.asList(soldDates);
+
+            // 각 itemType에 대한 평균 가격과 판매 일자를 Map에 추가
+            resultMap.put(itemType, Arrays.asList(averagePriceList, soldDateList));
+        }
+
+        // 전체 시세 확인
+        System.out.println("전체 시세 확인: " + resultMap);
+
+        return resultMap;
     }
 
 

@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     Optional<Users> findByUsername(String username); // 유저네임으로 비밀번호 변경하기 위한 메소드
 
+    Optional<Users> findByEmail(String email);
 
     @EntityGraph(attributePaths = "authorities")
         // Lazy조회가 아닌 Eager 조회로 authorities 정보를 같이 가져오게 됨

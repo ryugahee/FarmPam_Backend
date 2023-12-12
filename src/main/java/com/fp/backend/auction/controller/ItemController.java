@@ -75,7 +75,7 @@ public class ItemController {
     @PostMapping("/item/marketValue")
     public ResponseEntity<Map<String, List<?>>> getItemMarketValue(@RequestBody ItemMarketValueDto itemType) {
 
-        System.out.println("시세 컨트롤러 진입");
+        System.out.println("시세 검색 컨트롤러 진입");
 
         System.out.println("키워드 확인 : " + itemType.getItemType());
 
@@ -84,6 +84,17 @@ public class ItemController {
         System.out.println(marketValues);
 
         return new ResponseEntity<>(marketValues, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/item/allMarketValues")
+    public ResponseEntity getAllMarketValues() {
+
+        System.out.println("전체 시세 조회 컨트롤러 진입");
+
+        Map<String, List<?>> resultMap = itemService.getAllMarketValues();
+
+        return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
 
 

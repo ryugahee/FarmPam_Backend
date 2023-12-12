@@ -5,9 +5,27 @@ import lombok.Getter;
 @Getter
 public class SignupDto {
 
-    private String userName;
-    private String userPassword;
-    private String userEmail;
-    private String userPhoneNumber;
-    private String userLocal;
+    private String username;
+    private String password;
+    private boolean enabled;
+
+    private String realName;
+
+    private String nickname;
+
+    private Integer age;
+
+    private String email;
+
+    private String mailCode;
+
+    private String streetAddress;
+
+    private String detailAddress;
+
+    public SignupDto(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }
