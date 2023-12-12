@@ -36,6 +36,8 @@ public class ItemFormDto {
     // 태그 저장
     private List<String> tagNames;
 
+    private String userId;
+
     private static ModelMapper modelMapper = new ModelMapper();
 
     public Item createItem() {
@@ -45,22 +47,19 @@ public class ItemFormDto {
         ItemFormDto itemFormDto = modelMapper.map(item, ItemFormDto.class);
 
         // 남은 경매 시간
-        long currentTimeMillis = System.currentTimeMillis();
-        long elapsedTimeInMillis = item.getTime() - currentTimeMillis;
-        if (elapsedTimeInMillis > 0) {
-            itemFormDto.setTime(elapsedTimeInMillis);
-            System.out.println("경매마감시간-현재시간: " + elapsedTimeInMillis);
+        long elapsedTime = item.getTime() - System.currentTimeMillis();
+        if (elapsedTime > 0) {
+            itemFormDto.setTime(elapsedTime);
+            System.out.println("경매마감시간-현재시간: " + elapsedTime);
         } else {
-            itemFormDto.setIsSoldout(true);  // 경매 종료된 경우 isSoldout을 true로 설정
+            itemFormDto.setTime(0);
+            itemFormDto.setIsSoldout(true);
         }
-
 
         return itemFormDto;
 
-
-//        return modelMapper.map(item, ItemFormDto.class);
     }
-
 
     // 추가할 것 - 작성자 정보
 }
+
