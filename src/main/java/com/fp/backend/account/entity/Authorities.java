@@ -1,19 +1,20 @@
 package com.fp.backend.account.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class Authorities {
+
+//    @Id
+//    @Column(name = "authority_name", length = 50)
+//    private String authorityName;
+//
+//    private String username;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +23,6 @@ public class Authorities {
     private String authority;
 
     private String username;
+
 }
+

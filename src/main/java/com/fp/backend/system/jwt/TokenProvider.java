@@ -106,22 +106,44 @@ public class TokenProvider  implements InitializingBean {
 
     }
 
-    public Authentication getAuthentication(String token) {
-        Claims claims = Jwts
-                .parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    //엑세스 토큰 생성
+    public String createAccessToken() {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
 
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+        return Jwts.builder()
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
 
-        User principal = new User(claims.getSubject(), "", authorities);
+    }
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    //리프레시 토큰 생성
+    public String createRefreshToken() {
+
+        long now = (new Date()).getTime();
+
+        return Jwts.builder()
+                .setSubject("RefreshToken")
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(new Date(now + 86400000))
+                .compact();
+
+    }
+
+
+    //헤더에서 엑세스토큰 꺼내기
+    public Optional<String> extractAccessToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader("Authorization"))
+                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
+                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
+    }
+
+    //헤더에서 리프레시토큰 꺼내기
+    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader("AuthorizationRefresh"))
+                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
+                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
     }
 
     //헤더에서 엑세스토큰 꺼내기
@@ -158,50 +180,26 @@ public class TokenProvider  implements InitializingBean {
         }
     }
 
-//    public boolean validateAccessToken(String token) {
-//        try {
-//            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-//            return true;
-//        } catch (Exception e) {
-//            return false;
-//        }
+
+//    public Authentication getAuthentication(String token) {
+//        Claims claims = Jwts
+//                .parserBuilder()
+//                .setSigningKey(key)
+//                .build()
+//                .parseClaimsJws(token)
+//                .getBody();
+//
+//        Collection<? extends GrantedAuthority> authorities =
+//                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+//                        .map(SimpleGrantedAuthority::new)
+//                        .collect(Collectors.toList());
+//
+//        User principal = new User(claims.getSubject(), "", authorities);
+//
+//        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
 //    }
 
 
-
-
-
-
-    //    public TokenDto createToken(Authentication authentication) {
-//        String authorities = authentication.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.joining(","));
-//
-//        long now = (new Date()).getTime();
-//        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
-//
-//        String accessToken = Jwts.builder()
-//                .setSubject(authentication.getName())
-//                .claim(AUTHORITIES_KEY, authorities)
-//                .signWith(key, SignatureAlgorithm.HS512)
-//                .setExpiration(validity)
-//                .compact();
-//
-//        String refreshToken = Jwts.builder()
-//                .setSubject(authentication.getName())
-//                .claim(AUTHORITIES_KEY, authorities)
-//                .signWith(key, SignatureAlgorithm.HS512)
-//                .setExpiration(new Date(now + 86400000))
-//                .compact();
-//
-//
-//        return TokenDto.builder()
-//                .grantType("Bearer")
-//                .username(authentication.getName())
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .build();
-//    }
 
 }
 
