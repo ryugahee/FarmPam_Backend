@@ -14,6 +14,8 @@ public class ItemFormDto {
 
     private Long id;
 
+    private String userName;
+
     private String itemTitle;
 
     private Integer minPrice;

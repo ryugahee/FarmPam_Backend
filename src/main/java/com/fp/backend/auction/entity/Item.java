@@ -22,6 +22,9 @@ public class Item extends BaseEntity {
     @Id
     private Long id;
 
+    @Column(nullable = false)
+    private String userName;
+
     @Column(nullable = false, length = 50)
     private String itemTitle;
 
