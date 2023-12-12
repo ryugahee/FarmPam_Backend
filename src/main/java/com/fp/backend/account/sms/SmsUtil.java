@@ -1,4 +1,4 @@
-package com.fp.backend.account.util;
+package com.fp.backend.account.sms;
 
 import jakarta.annotation.PostConstruct;
 import net.nurigo.sdk.NurigoApp;
@@ -24,14 +24,15 @@ public class SmsUtil {
     }
 
     // 단일 메시지 발송 예제
-    public SingleMessageSentResponse sendOne(String to, String verificationCode) {
+    public SingleMessageSentResponse sendOne(String to, Integer verificationCode) {
+
         Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
         message.setFrom("01033842874");
-//        message.setTo(to);
-
-        message.setTo("01033842874");
+        message.setTo(to);
+//        message.setTo("01033842874");
         message.setText("[Moyiza] 아래의 인증번호를 입력해주세요\n" + verificationCode);
+
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         return response;

@@ -12,7 +12,6 @@ import java.util.List;
 
 @Repository
 public interface AuthoritiesRepository extends JpaRepository<Authorities, Long> {
-
     @Transactional
     @Modifying
     @Query("UPDATE Authorities a SET a.authority = :authority WHERE a.username = :username")

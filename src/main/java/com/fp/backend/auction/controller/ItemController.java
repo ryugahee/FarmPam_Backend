@@ -2,16 +2,24 @@ package com.fp.backend.auction.controller;
 
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
+
+import com.fp.backend.auction.dto.ItemMarketValueDto;
+import com.fp.backend.auction.service.ItemService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import com.fp.backend.auction.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -92,11 +100,40 @@ public class ItemController {
         return new ResponseEntity<>(itemDetail, HttpStatus.OK);
     }
 
+
+    //날짜별 품목 시세
+    @PostMapping("/item/marketValue")
+    public ResponseEntity<Map<String, List<?>>> getItemMarketValue(@RequestBody ItemMarketValueDto itemType) {
+
+        System.out.println("시세 검색 컨트롤러 진입");
+
+        System.out.println("키워드 확인 : " + itemType.getItemType());
+
+        Map<String, List<?>> marketValues = itemService.searchMarketValues(itemType.getItemType());
+
+        System.out.println(marketValues);
+
+        return new ResponseEntity<>(marketValues, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/item/allMarketValues")
+    public ResponseEntity getAllMarketValues() {
+
+        System.out.println("전체 시세 조회 컨트롤러 진입");
+
+        Map<String, List<?>> resultMap = itemService.getAllMarketValues();
+
+        return new ResponseEntity<>(resultMap, HttpStatus.OK);
+    }
+
+
     @GetMapping("/item/detail/{id}/seller")
     public ResponseEntity<String> getSellerId(@PathVariable Long id) {
         log.info("getSellerId {}", id);
 
         String sellerId = itemService.getSellerId(id);
+
 
         return new ResponseEntity<>(sellerId, HttpStatus.OK);
     }

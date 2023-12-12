@@ -1,14 +1,17 @@
 package com.fp.backend.account.service;
 
 import com.fp.backend.account.common.AuthorityName;
-import com.fp.backend.account.common.HeaderOptionName;
+
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
 import com.fp.backend.account.entity.Authorities;
 import com.fp.backend.account.entity.Users;
-import com.fp.backend.account.repository.AccessTokenRepository;
+import com.fp.backend.account.enums.HeaderOptionName;
 import com.fp.backend.account.repository.AuthoritiesRepository;
 import com.fp.backend.account.repository.UserRepository;
+import com.fp.backend.account.sms.SmsUtil;
+import com.fp.backend.system.config.redis.RedisService;
+
 import com.fp.backend.system.jwt.TokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +25,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +35,13 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
     private final TokenProvider tokenProvider;
-
-    private final AccessTokenRepository accessTokenRepository;
-
     private final AuthoritiesRepository authoritiesRepository;
+    private final RedisService redisUserService;
+    private final SmsUtil smsUtil;
 
-    private final RedisUserService redisUserService;
-
-
-    //자체 회원가입
+    //회원가입
     public ResponseEntity<String> userSignUp(SignupDto dto) {
 
         Optional<Users> dbUser = userRepository.findByUsername(dto.getUsername());
@@ -72,10 +67,13 @@ public class UserService {
 
 
             return ResponseEntity.ok().body("가입 성공");
+
         }
         return ResponseEntity.badRequest().body("가입 실패");
     }
 
+
+    //로그인
     public ResponseEntity<Map<String, String>> userLogin(LoginDto dto, HttpServletResponse response) throws IOException {
 
         System.out.println("유저 login service: " + dto.getUsername());
@@ -145,9 +143,10 @@ public class UserService {
         map.put("redirectPage", redirectUri);
 
         return new ResponseEntity<>(map, HttpStatus.OK);
+
     }
 
-    //TODO: 로그아웃 처리
+    //로그아웃
     public void userLogout(HttpServletResponse response) {
 
         String username = response.getHeader("username");
@@ -159,5 +158,30 @@ public class UserService {
 
     }
 
+
+    //휴대폰 인증번호 전송
+    public void userPhoneCheck(String phoneNumber) {
+        Random random = new Random();
+
+        // 1000부터 9999까지의 범위에서 랜덤 숫자 생성
+        int minRange = 1000;
+        int maxRange = 9999;
+        int randomNumber = random.nextInt(maxRange - minRange + 1) + minRange;
+
+        redisUserService.smsCodeSave(Integer.toString(randomNumber), phoneNumber);
+
+        smsUtil.sendOne(phoneNumber, randomNumber);
+    }
+
+    public String compareSMSCode(String userSMSCode, String phoneNumber) {
+
+        //인증번호가 일치하지 않으면
+        if (!redisUserService.compareSMS(userSMSCode, phoneNumber)) {
+            return "인증번호를 다시 입력해주세요";
+        }
+
+        return "";
+
+    }
 
 }
