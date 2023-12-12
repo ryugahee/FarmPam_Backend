@@ -16,7 +16,7 @@ public class ItemDto {
 
     private long time;
 
-    private String itemType;
+    private String city;
 
     private int weight;
 

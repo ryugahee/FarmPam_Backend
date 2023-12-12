@@ -43,8 +43,8 @@ public class ItemService {
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
 
-        item.setTime(updatedTime);
 
+        item.setTime(updatedTime);
         item.setIsSoldout(false);
 
         itemRepository.save(item);
@@ -75,31 +75,25 @@ public class ItemService {
         System.out.println("타입: " + sortType);
         System.out.println("타입: " + keyword);
 
-        //키워드 존재
+
         if (keyword != "") {
-            //키워드 + 마감시간
+
             if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7);
                 itemList = this.itemRepository.findByKeywordAndTime(keyword, pageable);
             } else {
-                //키워드 + 최신
                 PageRequest pageable = PageRequest.of(page, 7);
                 itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
             }
-            //노키워드
         } else {
-            // 노키워드 + 마감시간
             if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
             } else {
-                // 노키워드 + 최신
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
             }
         }
-
-        System.out.println("아이템갯수: " + itemList.getSize());
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
@@ -134,17 +128,13 @@ public class ItemService {
 
         System.out.println("타입: " + keyword);
 
-        //키워드 존재
         if (keyword != "") {
             PageRequest pageable = PageRequest.of(page, 7);
             itemList = this.itemRepository.findByKeywordAndLatest(keyword, pageable);
-            //노키워드
         } else {
             PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
             itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
         }
-
-        System.out.println("아이템갯수: " + itemList.getSize());
 
         List<ItemFormDto> itemFormDtoList = new ArrayList<>();
         for (Item item : itemList) {
@@ -163,9 +153,6 @@ public class ItemService {
             if (!itemFormDto.getIsSoldout()) {
                 itemFormDtoList.add(itemFormDto);
             }
-
-            System.out.println("네브시간: " + itemFormDto.getTime());
-            System.out.println("네브솔아: " + itemFormDto.getIsSoldout());
 
         }
         return itemFormDtoList;

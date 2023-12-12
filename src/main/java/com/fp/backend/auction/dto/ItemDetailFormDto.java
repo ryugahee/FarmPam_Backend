@@ -20,7 +20,7 @@ public class ItemDetailFormDto {
 
     private long time;
 
-    private String itemType;
+    private String city;
 
     private int weight;
 
@@ -49,6 +49,4 @@ public class ItemDetailFormDto {
         return itemDetailFormDto;
     }
 
-
-    // 추가할 것 - 작성자 프로필사진, 닉네임, 별점
 }

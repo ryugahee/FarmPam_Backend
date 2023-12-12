@@ -35,7 +35,7 @@ public class Item extends BaseEntity {
     private long time;
 
     @Column(nullable = false)
-    private String itemType;
+    private String city;
 
     @Column(nullable = false)
     private int weight;
