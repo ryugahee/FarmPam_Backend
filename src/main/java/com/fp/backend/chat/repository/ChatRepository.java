@@ -9,4 +9,7 @@ import java.util.List;
 public interface ChatRepository extends MongoRepository<Chat, Long> {
     @Query("{ $or: [ { 'firstUserId': ?0 }, { 'secondUserId': ?0 } ] }")
     List<Chat> findChatsByFirstUserIdOrSecondUserId(String userId);
+
+    @Query("{$or: [ { 'firstUserId': ?0 }, { 'secondUserId': ?0 } ], $and: [{'itemId': ?1 }]}")
+    Chat findByFirstUserIdOrSecondUserIdAndItemId(String userId, Long itemId);
 }
