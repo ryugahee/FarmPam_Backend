@@ -24,7 +24,7 @@ public class Chat {
 
     private String secondUserId;
 
-    private List<ChatMessage> chatMessages;
+    private List<ChatMessage> chatMessages = new ArrayList<>();
 
     private String createdAt;
 

@@ -66,8 +66,7 @@ public class ChatServiceImpl implements ChatService {
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
 
             // 경매 정보 찾기
-            Item item = itemRepository.findById(chat.getItemId())
-                    .orElseThrow(() -> new RuntimeException("존재하지 않은 경매 물품을 찾으려고 합니다."));
+            Item item = getItem(chat.getItemId());
 
 
             // 경매 썸네일 이미지 찾기
@@ -95,7 +94,7 @@ public class ChatServiceImpl implements ChatService {
         return result;
     }
 
-    private static ChatMessage getLastChatMessage(List<ChatMessage> chatMessages) {
+    private ChatMessage getLastChatMessage(List<ChatMessage> chatMessages) {
         if (hasNotMessage(chatMessages)) {
             return ChatMessage.builder()
                     .message("")
@@ -105,7 +104,7 @@ public class ChatServiceImpl implements ChatService {
         return chatMessages.get(chatMessages.size() - 1);
     }
 
-    private static boolean hasNotMessage(List<ChatMessage> chatMessages) {
+    private boolean hasNotMessage(List<ChatMessage> chatMessages) {
         return chatMessages.isEmpty();
     }
 
@@ -124,8 +123,7 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
 
         // 경매 정보 찾기
-        Item item = itemRepository.findById(chat.getItemId())
-                .orElseThrow(() -> new RuntimeException("존재하지 않은 경매 물품을 찾으려고 합니다."));
+        Item item = getItem(chat.getItemId());
 
         ItemImg itemImg = itemImgRepository.findByItem(item)
                 .stream().findFirst()
@@ -174,6 +172,11 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public Long createChat(NewChatInfoDTO dto) {
+
+        Item item = getItem(dto.getItemId());
+
+        validateUserNotSeller(dto, item);
+
         Chat oldChat = chatRepository.findByFirstUserIdOrSecondUserIdAndItemId(dto.getFirstUserId(), dto.getItemId());
         if (hasChat(oldChat)) {
             return oldChat.getChatId();
@@ -187,7 +190,22 @@ public class ChatServiceImpl implements ChatService {
         return newChatId;
     }
 
-    private static boolean hasChat(Chat oldChat) {
+    private void validateUserNotSeller(NewChatInfoDTO dto, Item item) {
+        if (isSeller(dto.getFirstUserId(), item.getUsers().getUsername())) {
+            throw new RuntimeException("자기 자신과 대화 할 수 없습니다.");
+        }
+    }
+
+    private Item getItem(Long dto) {
+        return itemRepository.findById(dto)
+                .orElseThrow(() -> new RuntimeException("존재하지 않은 경매 물품을 찾으려고 합니다."));
+    }
+
+    private boolean isSeller(String userId, String username) {
+        return Objects.equals(userId, username);
+    }
+
+    private boolean hasChat(Chat oldChat) {
         return !Objects.isNull(oldChat);
     }
 
