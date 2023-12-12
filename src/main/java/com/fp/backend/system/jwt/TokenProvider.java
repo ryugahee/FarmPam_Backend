@@ -106,45 +106,8 @@ public class TokenProvider  implements InitializingBean {
 
     }
 
-    //엑세스 토큰 생성
-    public String createAccessToken() {
-        long now = (new Date()).getTime();
-        Date validity = new Date(now + this.tokenValidityInMilliseconds); // 토큰 만료 시간
-
-        return Jwts.builder()
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validity)
-                .compact();
-
-    }
-
-    //리프레시 토큰 생성
-    public String createRefreshToken() {
-
-        long now = (new Date()).getTime();
-
-        return Jwts.builder()
-                .setSubject("RefreshToken")
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(new Date(now + 86400000))
-                .compact();
-
-    }
 
 
-    //헤더에서 엑세스토큰 꺼내기
-    public Optional<String> extractAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader("Authorization"))
-                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
-                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
-    }
-
-    //헤더에서 리프레시토큰 꺼내기
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader("AuthorizationRefresh"))
-                .filter(refreshToken -> refreshToken.startsWith("Bearer "))
-                .map(refreshToken -> refreshToken.replace("Bearer ", ""));
-    }
 
     //헤더에서 엑세스토큰 꺼내기
     public Optional<String> extractAccessToken(HttpServletRequest request) {
