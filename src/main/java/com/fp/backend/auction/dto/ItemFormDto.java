@@ -14,8 +14,6 @@ public class ItemFormDto {
 
     private Long id;
 
-    private String userName;
-
     private String itemTitle;
 
     private Integer minPrice;
@@ -24,7 +22,7 @@ public class ItemFormDto {
 
     private long time;
 
-    private String itemType;
+    private String city;
 
     private int weight;
 
@@ -62,6 +60,4 @@ public class ItemFormDto {
 
     }
 
-    // 추가할 것 - 작성자 정보
 }
-
