@@ -1,6 +1,8 @@
 package com.fp.backend.auction.service;
 
 
+
+import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.auction.dto.ItemDetailFormDto;
@@ -12,11 +14,12 @@ import com.fp.backend.auction.entity.ItemTagMap;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
+import com.fp.backend.system.config.redis.RedisService;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,9 @@ public class ItemService {
     private final ItemTagMapRepository itemTagMapRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
+    private final RedisService redisService;
+    private final Gson gson;
+
     private final UserRepository userRepository;
 
     // 경매 등록
@@ -69,6 +75,20 @@ public class ItemService {
 
         // 태그 등록
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
+
+
+        String Id = String.valueOf(item.getId());
+        String userName = (item.getUserName());
+        System.out.println("userName = " + userName);
+        String minPrice = String.valueOf((item.getMinPrice()));
+        System.out.println("minPrice = " + minPrice);
+        BidData bidData = new BidData(userName, minPrice);
+
+        String data = gson.toJson(bidData);
+
+        System.out.println("Register Data = " + data);
+
+        redisService.setValuesPush(Id, data);
 
         return item.getId();
     }
