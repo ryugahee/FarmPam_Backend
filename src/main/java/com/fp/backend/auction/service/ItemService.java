@@ -80,7 +80,7 @@ public class ItemService {
 
 
         String Id = String.valueOf(item.getId());
-        String userName = (item.getUserName());
+        String userName = (users.getUsername());
         System.out.println("userName = " + userName);
         String minPrice = String.valueOf((item.getMinPrice()));
         System.out.println("minPrice = " + minPrice);
