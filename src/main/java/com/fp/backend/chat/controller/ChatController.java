@@ -1,6 +1,6 @@
 package com.fp.backend.chat.controller;
 
-import com.fp.backend.chat.domain.Message;
+import com.fp.backend.chat.domain.ChatMessage;
 import com.fp.backend.chat.dto.*;
 import com.fp.backend.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @MessageMapping("/receive/{chatId}")
-    @SendTo("/chat/{chatId}")
+    @SendTo("/send/{chatId}")
     public MessageDTO sendMessage(MessageDTO dto) {
         return dto;
     }
@@ -32,6 +32,7 @@ public class ChatController {
     //  남아있다는 가정하에 return 값에 user.id는 담지 않음.
     @PostMapping("/chats")
     public ResponseEntity<Long> createChat(@RequestBody NewChatInfoDTO dto) {
+        log.info("{}", dto);
         Long chatId = chatService.createChat(dto);
         return new ResponseEntity<>(chatId, HttpStatus.OK);
     }
@@ -55,9 +56,9 @@ public class ChatController {
     }
 
     @GetMapping("/chats/chatMessages")
-    public ResponseEntity<List<Message>> getChatMessages(@RequestParam Long chatId) {
-        List<Message> messages = chatService.getChatMessages(chatId);
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    public ResponseEntity<List<ChatMessage>> getChatMessages(@RequestParam Long chatId) {
+        List<ChatMessage> chatMessages = chatService.getChatMessages(chatId);
+        return new ResponseEntity<>(chatMessages, HttpStatus.OK);
     }
 
     @PostMapping("/chats/chatMessage")

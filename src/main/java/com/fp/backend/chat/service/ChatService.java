@@ -1,7 +1,7 @@
 package com.fp.backend.chat.service;
 
 import com.fp.backend.chat.domain.Chat;
-import com.fp.backend.chat.domain.Message;
+import com.fp.backend.chat.domain.ChatMessage;
 import com.fp.backend.chat.dto.ChatDetailInfoDTO;
 import com.fp.backend.chat.dto.ChatPreviewInfoDTO;
 import com.fp.backend.chat.dto.NewChatInfoDTO;
@@ -16,7 +16,7 @@ public interface ChatService {
 
     ChatDetailInfoDTO getChatDetailInfo(Long chatId, String userId);
 
-    List<Message> getChatMessages(Long chatId);
+    List<ChatMessage> getChatMessages(Long chatId);
 
     void sendMessage(SendMessageDTO dto);
 
