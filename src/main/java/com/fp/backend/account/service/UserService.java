@@ -173,6 +173,7 @@ public class UserService {
         smsUtil.sendOne(phoneNumber, randomNumber);
     }
 
+    //인증번호 확인 비교
     public String compareSMSCode(String userSMSCode, String phoneNumber) {
 
         //인증번호가 일치하지 않으면
@@ -183,5 +184,16 @@ public class UserService {
         return "";
 
     }
+
+
+    //모든 유저 가져오기
+    public List<Users> getAllUser() {
+
+       List<Users> allUsers = userRepository.findAll();
+
+        return allUsers;
+    }
+
+
 
 }

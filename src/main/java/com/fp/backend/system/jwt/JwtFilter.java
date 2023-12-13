@@ -46,13 +46,19 @@ public class JwtFilter extends OncePerRequestFilter {
                         request.getRequestURI().equals(ApiName.SIGNUP.getKey()) ||
                         request.getRequestURI().equals(ApiName.LOGOUT.getKey()) ||
                         request.getRequestURI().equals("/api/checkPhoneNumber") ||
-                        request.getRequestURI().equals("/favicon.ico")
+                        request.getRequestURI().equals("/favicon.ico") ||
+                        request.getRequestURI().equals("/api/item/allMarketValues") ||
+                        request.getRequestURI().equals("/api/item/marketValue") ||
+                        request.getRequestURI().equals("/api/item/new") ||
+                        request.getRequestURI().equals("/api/item/getAuctionOngoing")
+
 
         ) {
             System.out.println("로그인/회원가입/로그아웃 요청이라 JwtFilter 통과!");
             filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
+
 
         //엑세스 토큰 추출
         String accessToken = tokenProvider
