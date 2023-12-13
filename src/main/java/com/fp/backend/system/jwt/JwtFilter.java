@@ -46,7 +46,12 @@ public class JwtFilter extends OncePerRequestFilter {
                         request.getRequestURI().equals(ApiName.SIGNUP.getKey()) ||
                         request.getRequestURI().equals(ApiName.LOGOUT.getKey()) ||
                         request.getRequestURI().equals("/api/checkPhoneNumber") ||
-                        request.getRequestURI().equals("/favicon.ico")
+                        request.getRequestURI().equals("/favicon.ico") ||
+                        //test
+                        request.getRequestURI().equals("/item/list") ||
+                        request.getRequestURI().equals("/bid-list")||
+                        request.getRequestURI().equals("/nav/item/list") ||
+                        request.getRequestURI().equals("/item/new")
 
         ) {
             System.out.println("로그인/회원가입/로그아웃 요청이라 JwtFilter 통과!");

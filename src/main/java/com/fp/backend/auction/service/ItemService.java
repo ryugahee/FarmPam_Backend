@@ -62,7 +62,8 @@ public class ItemService {
         Item item = itemFormDto.createItem();
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
-
+        System.out.println("currentTimeMillis() = " + currentTimeMillis());
+        System.out.println("updatedTime = " + updatedTime);
 
 
         item.setTime(updatedTime);
@@ -94,7 +95,7 @@ public class ItemService {
         System.out.println("userName = " + userName);
         String minPrice = String.valueOf((item.getMinPrice()));
         System.out.println("minPrice = " + minPrice);
-        BidData bidData = new BidData(userName, minPrice);
+        BidData bidData = new BidData(userName, minPrice, updatedTime);
 
         String data = gson.toJson(bidData);
 
