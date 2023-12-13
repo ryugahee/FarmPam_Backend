@@ -78,9 +78,8 @@ public class MemberController {
     }
 
     @GetMapping("/test")
-    public String test() {
-        System.out.println("필터 다 거치고 테스트로");
-        return "인가 완료";
+    public void test() {
+        System.out.println("토큰 검증 통과!");
     }
 
     @PostMapping("/googleLogin")
@@ -101,7 +100,7 @@ public class MemberController {
         map.put(HeaderOptionName.ACCESSTOKEN.getKey(), response.getHeader("accessToken"));
         map.put(HeaderOptionName.REFRESHTOKEN.getKey(), response.getHeader("refreshToken"));
 
-        System.out.println("리프레시 컨트롤러");
+        System.out.println("리프레시 컨트롤러 진입. 엑세스/리프레시 토큰 재발급 완료!");
 
         return new ResponseEntity<>(map, HttpStatus.OK);
     }

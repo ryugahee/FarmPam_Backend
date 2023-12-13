@@ -118,11 +118,11 @@ public class UserService {
         if (isAdmin) {
             System.out.println("사용자가 ROLE_ADMIN을 가지고 있습니다.");
 
-            redirectUri = "/admin"; // 관리자 페이지로
+            redirectUri = "admin"; // 관리자 페이지로
 
             userRole = AuthorityName.ADMIN.getKey();
         } else {
-            redirectUri = "/"; // 홈으로
+            redirectUri = "home"; // 홈으로
         }
 
         String accessToken = tokenProvider.createAccessToken();
