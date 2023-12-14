@@ -43,7 +43,9 @@ public class RedisService {
     }
     public void setValuesPush(String key, String data){
         ListOperations<String, Object> list = redisTemplate.opsForList();
+
         list.leftPush(key, data);
+        System.out.println("data = " + data);
     }
     public String getValuesLastIndex(String key){
         ListOperations<String, Object> list = redisTemplate.opsForList();
