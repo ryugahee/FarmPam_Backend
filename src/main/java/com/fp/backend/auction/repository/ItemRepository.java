@@ -19,7 +19,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Slice<Item> findByIsSoldoutFalseOrderByIdDesc(PageRequest pageable);
 
 
-    //스케줄러
+    //경매상태 업데이트
     List<Item> findByTimeLessThan(long currentTimeMillis);
 
     //키워드 + 최신

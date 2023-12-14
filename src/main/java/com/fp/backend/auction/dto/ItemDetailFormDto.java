@@ -35,12 +35,11 @@ public class ItemDetailFormDto {
     public static ItemDetailFormDto of(Item item) {
         ItemDetailFormDto itemDetailFormDto = modelMapper.map(item, ItemDetailFormDto.class);
 
-        // 남은 경매 시간
+        // 경매 마감 시간
         long currentTime = System.currentTimeMillis();
         long elapsedTime = item.getTime() - currentTime;
         if (elapsedTime > 0) {
             itemDetailFormDto.setTime(elapsedTime);
-            System.out.println("경매마감시간-현재시간: " + elapsedTime);
         } else {
             itemDetailFormDto.setTime(0);
             itemDetailFormDto.setIsSoldout(true);
