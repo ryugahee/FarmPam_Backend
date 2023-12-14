@@ -35,9 +35,13 @@ jobs:
         shell: bash
 
       # 빌드 진행
+#      - name: Build with Gradle
+#        run: ./gradlew build
+#        shell: bash
       - name: Build with Gradle
-        run: gradlew build
-        shell: bash
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: build
 
       # 압축 파일 생성
       - name: Make Zip File
