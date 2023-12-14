@@ -73,14 +73,8 @@ public class BidService {
     @Scheduled(fixedDelay = 10*1000)
     @Transactional
     public void checkTime(){
-//        ScanOptions options = ScanOptions.scanOptions().match("*").count(100).build();
-
         ListOperations<String, Object> list = redisTemplate.opsForList();
         Set<String> keys = redisTemplate.keys("*");
-//        Cursor<String> keys = redisTemplate.scan(options);
-        List<Long> soldOutBid = new ArrayList<>();
-        List<Long> timeList = new ArrayList<>();
-
         if (keys != null) {
             for(String key : keys){
                 int index = key.indexOf(":");
@@ -92,16 +86,11 @@ public class BidService {
                 System.out.println("nowTime = " + currentTimeMillis());
                 bid = getInstance().fromJson((String) data, Bid.class);
                 long bidTime = Long.parseLong(bid.getBidTime());
-
-                timeList.add(bidTime);
                 if(bidTime <= currentTimeMillis()){
                     Item item = itemRepository.findById(bidIds)
                             .orElseThrow(IllegalAccessError::new);
-                    soldOutBid.add(bidIds);
                     item.setIsSoldout(true);
-
                     itemRepository.save(item);
-
                 }
                 redisTemplate.delete(String.valueOf(bidIds));
             }
