@@ -3,6 +3,7 @@ package com.fp.backend.system.config.redis;
 import com.fp.backend.system.config.websocket.SocketVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
 
     private final StringRedisTemplate stringRedisTemplate;
-
+    @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate;
 
 
