@@ -7,6 +7,7 @@ import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BidService {
+    @Qualifier("redisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private final ItemRepository itemRepository;
     private static Gson gson;
