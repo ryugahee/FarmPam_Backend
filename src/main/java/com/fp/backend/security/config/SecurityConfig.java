@@ -69,9 +69,9 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/login"),
                                         new AntPathRequestMatcher("/api/checkPhoneNumber"),
                                         new AntPathRequestMatcher("/api/userLogout"),
-                                        new AntPathRequestMatcher("/favicon.ico"),
-                                        // 테스트용
-                                        new AntPathRequestMatcher("/*")
+//                                        new AntPathRequestMatcher("/api/item/allMarketValues"),
+                                        new AntPathRequestMatcher("/api/item/marketValue"),
+                                        new AntPathRequestMatcher("/favicon.ico")
 
                                 ).permitAll()
 //                                .anyRequest().authenticated()

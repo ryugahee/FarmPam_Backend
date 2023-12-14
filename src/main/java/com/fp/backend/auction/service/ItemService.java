@@ -11,7 +11,6 @@ import com.fp.backend.auction.dto.ItemImgDto;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.ItemImg;
 import com.fp.backend.auction.entity.ItemTagMap;
-import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
@@ -253,52 +252,88 @@ public class ItemService {
     //시세 검색
     public Map<String, List<?>> searchMarketValues(String itemType) {
 
-        String defaultSql = "FROM market_value\n" +
-                "where item_type LIKE :itemType\n" +
-                "AND sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE() \n" +
-                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+        String defaultSql = "SELECT \n" +
+                "  item_type,\n" +
+                "  GROUP_CONCAT(average_price ORDER BY sold_date SEPARATOR ',') AS prices,\n" +
+                "  GROUP_CONCAT(sold_date ORDER BY sold_date SEPARATOR ',') AS dates\n" +
+                "FROM (\n" +
+                "  SELECT \n" +
+                "    item_type,\n" +
+                "    AVG(average_price) AS average_price,\n" +
+                "    DATE(sold_date) AS sold_date\n" +
+                "  FROM market_value\n" +
+                "  WHERE sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()\n" +
+                "  AND item_type = :itemType \n" +
+                "  GROUP BY item_type, DATE(sold_date)\n" +
+                ") AS avg_prices\n" +
+                "GROUP BY item_type;";
 
-//        List<MarketValue> marketValues = marketValueRepository.findMarketValues(itemType);
-
-        String sql = "SELECT AVG(average_price) AS average_price, DATE_FORMAT(sold_date, '%Y-%m-%d') AS day, item_type\n" +
-                defaultSql;
-
-        List<MarketValue> resultList = entityManager.createNativeQuery(sql)
-                .setParameter("itemType", "%" + itemType + "%")
-                .getResultList();
-
-
-        String priceSql = "SELECT AVG(average_price) AS average_price\n" +
-                defaultSql;
-
-
-        List<Integer> priceList = entityManager.createNativeQuery(priceSql).setParameter("itemType", "%" + itemType + "%").getResultList();
-
-        String dateSql = "SELECT DATE_FORMAT(sold_date, '%Y-%m-%d') AS day\n" +
-                defaultSql;
-
-
-        List<String> dayList = entityManager.createNativeQuery(dateSql).setParameter("itemType", "%" + itemType + "%").getResultList();
-
-        String itemSql = "SELECT item_type\n" +
-                defaultSql;
-
-
-        List<String> itemList = entityManager.createNativeQuery(itemSql).setParameter("itemType", "%" + itemType + "%").getResultList();
-
-        entityManager.close();
+//        String defaultSql2 = "SELECT AVG(average_price) AS average_price, DATE_FORMAT(sold_date, '%Y-%m-%d') AS day, item_type\n" +
+//                "FROM market_value\n" +
+//                "where item_type = '배'\n" +
+//                "and sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()\n" +
+//                "GROUP BY DATE_FORMAT(sold_date, '%Y-%m-%d'), item_type";
+//
+////        List<MarketValue> marketValues = marketValueRepository.findMarketValues(itemType);
+//
+//        String sql = "SELECT AVG(average_price) AS average_price, DATE_FORMAT(sold_date, '%Y-%m-%d') AS day, item_type\n" +
+//                defaultSql;
+//
+//        List<MarketValue> resultList = entityManager.createNativeQuery(sql)
+//                .setParameter("itemType", "%" + itemType + "%")
+//                .getResultList();
+//
+//
+//        String priceSql = "SELECT AVG(average_price) AS average_price\n" +
+//                defaultSql;
+//
+//
+//        List<Integer> priceList = entityManager.createNativeQuery(priceSql).setParameter("itemType", "" + itemType + "").getResultList();
+//
+//        String dateSql = "SELECT DATE_FORMAT(sold_date, '%Y-%m-%d') AS day\n" +
+//                defaultSql;
+//
+//
+//        List<String> dayList = entityManager.createNativeQuery(dateSql).setParameter("itemType", "" + itemType + "").getResultList();
+//
+//        String itemSql = "SELECT item_type\n" +
+//                defaultSql;
+//
+//
+//        List<String> itemList = entityManager.createNativeQuery(itemSql).setParameter("itemType", "" + itemType + "").getResultList();
 
         Map<String, List<?>> resultMap = new HashMap<>();
 //        resultMap.put("resultList", resultList);
-        resultMap.put("priceList", priceList);
-        resultMap.put("dayList", dayList);
-        resultMap.put("itemList", itemList);
+//        resultMap.put("priceList", priceList);
+//        resultMap.put("dayList", dayList);
+//        resultMap.put("itemList", itemList);
+
+        List<Object[]> values = entityManager.createNativeQuery(defaultSql).setParameter("itemType", "" + itemType + "").getResultList();
+
+        entityManager.close();
+        for (Object[] row : values) {
+            String itemName = (String) row[0];
+            String[] averagePrices = ((String) row[1]).split(","); // 평균 가격들을 배열로 분리
+            String[] soldDates = ((String) row[2]).split(","); // 판매 일자들을 배열로 분리
+
+            List<String> averagePriceList = Arrays.asList(averagePrices);
+            List<String> soldDateList = Arrays.asList(soldDates);
+
+            // 각 itemType에 대한 평균 가격과 판매 일자를 Map에 추가
+            resultMap.put(itemName, Arrays.asList(averagePriceList, soldDateList));
+
+
+        }
+        System.out.println("검색 시세 확인: " + resultMap);
 
         return resultMap;
 
     }
 
-    public Map<String, List<?>> getAllMarketValues() {
+    public Map<String, List<?>> getAllMarketValues(int pageNum) {
+
+        int pageSize = 4; // 한 페이지에 보여줄 아이템 수
+        int offset = pageNum * pageSize; // offset 계산
 
         String sql = "SELECT \n" +
                 "  item_type,\n" +
@@ -313,9 +348,13 @@ public class ItemService {
                 "  WHERE sold_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()\n" +
                 "  GROUP BY item_type, DATE(sold_date)\n" +
                 ") AS avg_prices\n" +
-                "GROUP BY item_type;";
+                "GROUP BY item_type\n" +
+                "LIMIT :pageSize OFFSET :offset"; // 페이징 처리를 위한 LIMIT 및 OFFSET 사용
 
-        List<Object[]> values = entityManager.createNativeQuery(sql).getResultList();
+        List<Object[]> values = entityManager.createNativeQuery(sql)
+                .setParameter("pageSize", pageSize)
+                .setParameter("offset", offset)
+                .getResultList();
 
         // 데이터 처리를 위한 Map 생성
         Map<String, List<?>> resultMap = new HashMap<>();
@@ -339,6 +378,20 @@ public class ItemService {
         return resultMap;
     }
 
+    //총 페이지 수 구하기
+    public int findTotalPage() {
+        String sql = "SELECT COUNT(DISTINCT item_type) FROM market_value";
+        long totalCount = (long) entityManager.createNativeQuery(sql).getSingleResult();
+
+        if (totalCount > Integer.MAX_VALUE) {
+            throw new IllegalStateException("Total count exceeds Integer.MAX_VALUE");
+        }
+
+        int totalPage = (int) totalCount / 4 + 1;
+
+        return totalPage;
+    }
+
     // 스케줄러
     public void updateExpiredItems() {
         long currentTimeMillis = System.currentTimeMillis();
@@ -360,6 +413,19 @@ public class ItemService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않은 경매 입니다."));
 
         return item.getUsers().getUsername();
+    }
+
+
+    public Slice<Item> findAuctionOngoing() {
+
+        PageRequest pageable = PageRequest.of(0, 7, Sort.by("id").descending());
+
+        Slice<Item> onGoingItems = itemRepository.findAll(pageable);
+
+        System.out.println("온고잉 경매 보기 : " + onGoingItems);
+
+        return onGoingItems;
+
     }
 
 }
