@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -42,6 +43,7 @@ public class MemberController {
     private final RedisService redisUsersService;
 
 
+    //회원가입
     @PostMapping("/user/signup")
     public void signup(@RequestBody SignupDto dto) {
 
@@ -52,6 +54,7 @@ public class MemberController {
     }
 
 
+    //로그인
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDto dto, HttpServletResponse response) throws IOException {
 
@@ -63,6 +66,9 @@ public class MemberController {
 
 //        return new ResponseEntity(HttpStatus.OK);
     }
+
+
+    //로그아웃
     @PostMapping("/userLogout")
     public void logout(HttpServletResponse response) {
         System.out.println("로그아웃 요청");
@@ -72,9 +78,8 @@ public class MemberController {
     }
 
     @GetMapping("/test")
-    public String test() {
-        System.out.println("필터 다 거치고 테스트로");
-        return "인가 완료";
+    public void test() {
+        System.out.println("토큰 검증 통과!");
     }
 
     @PostMapping("/googleLogin")
@@ -83,6 +88,7 @@ public class MemberController {
         System.out.println("구글구글구글구글구글구글구글구글 로그인 요청");
     }
 
+    //엑세스 토큰이 유효하지 않을 때 리프레시 토큰 요청
     @PostMapping("/requireRefreshToken")
     public ResponseEntity refresh(HttpServletResponse response) {
 
@@ -94,11 +100,12 @@ public class MemberController {
         map.put(HeaderOptionName.ACCESSTOKEN.getKey(), response.getHeader("accessToken"));
         map.put(HeaderOptionName.REFRESHTOKEN.getKey(), response.getHeader("refreshToken"));
 
-        System.out.println("리프레시 컨트롤러");
+        System.out.println("리프레시 컨트롤러 진입. 엑세스/리프레시 토큰 재발급 완료!");
 
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
+    //휴대폰 인증 번호 요청
     @PostMapping("/checkPhoneNumber")
     public String phoneCheck(@RequestBody String phoneNumber) {
 
@@ -110,6 +117,7 @@ public class MemberController {
 
     }
 
+    //인증 번호 확인
     @PostMapping("/compareSMSNumber")
     public ResponseEntity smsNumberCheck(@RequestBody String smsNumber, @RequestBody String phoneNumber) {
 
@@ -123,6 +131,20 @@ public class MemberController {
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 
     }
+
+    //멤버 현황
+    @GetMapping("/getAllUsers")
+    public ResponseEntity getAllMember() {
+
+       List<Users> allUsers = userService.getAllUser();
+
+        System.out.println(allUsers);
+
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
+    }
+
+
+
   
 
 }

@@ -118,11 +118,11 @@ public class UserService {
         if (isAdmin) {
             System.out.println("사용자가 ROLE_ADMIN을 가지고 있습니다.");
 
-            redirectUri = "/admin"; // 관리자 페이지로
+            redirectUri = "admin"; // 관리자 페이지로
 
             userRole = AuthorityName.ADMIN.getKey();
         } else {
-            redirectUri = "/"; // 홈으로
+            redirectUri = "home"; // 홈으로
         }
 
         String accessToken = tokenProvider.createAccessToken();
@@ -173,6 +173,7 @@ public class UserService {
         smsUtil.sendOne(phoneNumber, randomNumber);
     }
 
+    //인증번호 확인 비교
     public String compareSMSCode(String userSMSCode, String phoneNumber) {
 
         //인증번호가 일치하지 않으면
@@ -183,5 +184,16 @@ public class UserService {
         return "";
 
     }
+
+
+    //모든 유저 가져오기
+    public List<Users> getAllUser() {
+
+       List<Users> allUsers = userRepository.findAll();
+
+        return allUsers;
+    }
+
+
 
 }
