@@ -41,7 +41,7 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private int weight;
 
-    @Column(name = "is_soldout")
+    @Column
     private Boolean isSoldout;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)

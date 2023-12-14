@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -23,11 +24,11 @@ public class RedisConfig {
     @Value("${spring.data.redis.port_Token}")
     private int redisPort_Token;
 
-    @Bean
-    public StringRedisTemplate stringRedisTemplate() {
-        RedisConnectionFactory factory = new LettuceConnectionFactory(redisHost_Token, redisPort_Token);
-        return new StringRedisTemplate(factory);
-    }
+//    @Bean
+//    public StringRedisTemplate stringRedisTemplate() {
+//        RedisConnectionFactory factory = new LettuceConnectionFactory(redisHost_Token, redisPort_Token);
+//        return new StringRedisTemplate(factory);
+//    }
     @Bean
     public RedisConnectionFactory redisConnectionFactory_Bid(){
         return new LettuceConnectionFactory(redisHost, redisPort);
