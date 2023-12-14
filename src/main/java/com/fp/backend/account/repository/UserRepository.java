@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
 //    Optional<Users> findByUsernameAndPassword(String username, String password);
 
-    Optional<Users> findByUsername(String username); // 유저네임으로 비밀번호 변경하기 위한 메소드
+    Optional<Users> findByUsername(String username);
 
     Optional<Users> findByEmail(String email);
 

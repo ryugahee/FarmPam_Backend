@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -24,20 +23,19 @@ public class RedisConfig {
     @Value("${spring.data.redis.port_Token}")
     private int redisPort_Token;
 
-//    @Bean
-//    public StringRedisTemplate stringRedisTemplate() {
-//        RedisConnectionFactory factory = new LettuceConnectionFactory(redisHost_Token, redisPort_Token);
-//        return new StringRedisTemplate(factory);
-//    }
+
     @Bean
-    public RedisConnectionFactory redisConnectionFactory_Bid(){
+    public RedisConnectionFactory redisConnectionFactory_Bid() {
         return new LettuceConnectionFactory(redisHost, redisPort);
-    }@Bean
-    public RedisConnectionFactory redisConnectionFactory_Token(){
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory_Token() {
         return new LettuceConnectionFactory(redisHost_Token, redisPort_Token);
     }
+
     @Bean
-    public RedisTemplate<?, ?> redisTemplate(){
+    public RedisTemplate<?, ?> redisTemplate() {
         RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory_Bid());
 
@@ -47,14 +45,15 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
     @Bean
-    public RedisTemplate<?, ?> redisTemplate_Token(){
+    public RedisTemplate<?, ?> redisTemplate_Token() {
         RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory_Token());
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setConnectionFactory(redisConnectionFactory_Bid());
+        redisTemplate.setConnectionFactory(redisConnectionFactory_Token());
 
         return redisTemplate;
     }

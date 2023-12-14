@@ -18,9 +18,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class RedisService {
-//
-//    @Qualifier("stringRedisTemplate")
-//    private final StringRedisTemplate stringRedisTemplate;
+
+
     @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -97,19 +96,20 @@ public class RedisService {
 
 
     //계정 관련
-    //레디스에 엑세스토큰 저장
+    //레디스에 엑세스토큰 저장(키: 엑세스 토큰, 값: 유저네임)
     public void accessTokenSave(String accessToken, String username) {
 
-        redisTemplate.opsForValue().set(username, accessToken);
+
+        redisTemplate.opsForValue().set(accessToken, username);
 
 //        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //레디스에서 동일한 엑세스토큰이 있는지 조회
-    public boolean accessTokenFind(String accessToken, String username) {
-        String redisAccessToken = (String) redisTemplate.opsForValue().get(username);
+    public boolean accessTokenFind(String accessToken) {
+        String redisAccessToken = (String) redisTemplate.opsForValue().get(accessToken);
 
-        return redisAccessToken.equals(accessToken);
+        return redisAccessToken.isEmpty();
 
     }
 
@@ -132,6 +132,8 @@ public class RedisService {
 
         return redisTemplate.opsForValue().get(phoneNumber).equals(userSMSCode);
     }
+
+
 
 
 

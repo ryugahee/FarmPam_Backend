@@ -1,5 +1,7 @@
 package com.fp.backend.security.config;
 
+import com.fp.backend.account.LoginFailureHandler;
+import com.fp.backend.account.repository.AuthoritiesRepository;
 import com.fp.backend.account.service.UserDetailService;
 import com.fp.backend.oauth2.handler.OAuth2LoginFailureHandler;
 import com.fp.backend.oauth2.handler.OAuth2LoginSuccessHandler;
@@ -46,11 +48,15 @@ public class SecurityConfig {
 
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
+    private final AuthoritiesRepository authoritiesRepository;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 //        JwtFilter customFilter = new JwtFilter(tokenProvider);
+
+
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -62,7 +68,7 @@ public class SecurityConfig {
 //                        .logoutSuccessUrl("http://localhost:3000/")
 //                        .deleteCookies("accessToken", "refreshToken", "username", "roles")
 //                        )
-
+//                .formLogin(formLogin -> formLogin.failureHandler(loginFailureHandler()))
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                                 .requestMatchers(
                                         new AntPathRequestMatcher("/api/user/signup"),
@@ -74,8 +80,8 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/favicon.ico")
 
                                 ).permitAll()
-//                                .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
                 )
 
                 .oauth2Login(oauth2 -> oauth2
@@ -97,7 +103,10 @@ public class SecurityConfig {
 
         return http.build();
     }
-
+    @Bean
+    public LoginFailureHandler loginFailureHandler() {
+        return new LoginFailureHandler();
+    }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() throws Exception {
@@ -114,9 +123,9 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-//            http
-//                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService), UsernamePasswordAuthenticationFilter.class)
-//            ;
+            http
+                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService, authoritiesRepository), UsernamePasswordAuthenticationFilter.class)
+            ;
 
         }
     }

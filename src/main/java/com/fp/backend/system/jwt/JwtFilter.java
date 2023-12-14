@@ -4,6 +4,7 @@ import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.ApiName;
 import com.fp.backend.account.enums.HeaderOptionName;
 import com.fp.backend.account.enums.MessageName;
+import com.fp.backend.account.repository.AuthoritiesRepository;
 import com.fp.backend.system.config.redis.RedisService;
 import com.fp.backend.system.util.PasswordUtil;
 import jakarta.servlet.FilterChain;
@@ -27,11 +28,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final RedisService redisUserService;
 
+    private final AuthoritiesRepository authoritiesRepository;
+
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
-    public JwtFilter(TokenProvider tokenProvider, RedisService redisUserService) {
+    public JwtFilter(TokenProvider tokenProvider, RedisService redisUserService, AuthoritiesRepository authoritiesRepository) {
         this.tokenProvider = tokenProvider;
         this.redisUserService = redisUserService;
+        this.authoritiesRepository = authoritiesRepository;
     }
 
     @Override
@@ -60,19 +64,25 @@ public class JwtFilter extends OncePerRequestFilter {
                         request.getRequestURI().equals(ApiName.SIGNUP.getKey()) ||
                         request.getRequestURI().equals(ApiName.LOGOUT.getKey()) ||
                         request.getRequestURI().equals("/api/checkPhoneNumber") ||
-
+                        request.getRequestURI().equals("/login") ||
                         request.getRequestURI().equals("/favicon.ico")
-//                        ||
-//                        request.getRequestURI().equals("/api/item/allMarketValues") ||
-//                        request.getRequestURI().equals("/api/item/marketValue") ||
-//                        request.getRequestURI().equals("/api/item/new") ||
-//                        request.getRequestURI().equals("/api/item/getAuctionOngoing")
-
 
         ) {
             System.out.println("로그인/회원가입/로그아웃 요청이라 JwtFilter 통과!");
             filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+        }
+
+        if ( //관리자 페이지의 요청이 들어왔다면
+                request.getRequestURI().equals("/api/item/marketValue") ||
+                request.getRequestURI().equals("/api/item/allMarketValues") ||
+                request.getRequestURI().equals("/api/getAllUsers")
+
+        ) {
+
+            //레디스에서 엑세스토큰(키)으로 유저네임 찾기
+
+
         }
 
 
@@ -88,8 +98,8 @@ public class JwtFilter extends OncePerRequestFilter {
             //액세스 토큰에 대한 판단
             ResponseEntity accessTokenResponseEntity = decideAccessTokenPath(accessToken);
 
-            //TODO: 중복 로그인 검증. 레디스에서 해당 유저 네임의 엑세스 토큰이 일치하는지 확인
-            boolean result = redisUserService.accessTokenFind(accessToken, request.getHeader("username"));
+            //중복 로그인 검증. 레디스에서 해당 엑세스 토큰이 일치하는지 확인
+            boolean result = redisUserService.accessTokenFind(accessToken);
 
 
             System.out.println("중복 로그인 검증 결과 : " + result);

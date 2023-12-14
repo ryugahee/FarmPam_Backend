@@ -83,10 +83,22 @@ public class UserService {
 
         System.out.println("로그인 토큰 확인 : " + authenticationToken);
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Map<String, String> map = new HashMap<>();
 
         List<Authorities> userRoles = authoritiesRepository.findByUsername(dto.getUsername());
+
+        Optional<Users> user = userRepository.findByUsername(dto.getUsername());
+//
+        System.out.println("유저 : " + user.toString());
+//
+        System.out.println("비밀번호 비교" + bCryptPasswordEncoder.encode(dto.getPassword()));
+
+
+        if (userRoles.isEmpty()) { // role이 없다는 건 회원가입한 유저가 아니라는 뜻, 입력한 패스워드도 일치하지 않으면
+            System.out.println("가입한 유저가 아니라서 리턴시키기");
+            map.put("errMsg", "아이디 또는 비밀번호를 잘못 입력했습니다.");
+            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+        }
 
 
         boolean isAdmin = false;
@@ -134,13 +146,29 @@ public class UserService {
 
 
         //로그인 응답에 보낼 권한명, 엑세스, 리프레시 토큰
-        Map<String, String> map = new HashMap<>();
+
 
         map.put(HeaderOptionName.ROLE.getKey(), userRole);
         map.put(HeaderOptionName.ACCESSTOKEN.getKey(), accessToken);
         map.put(HeaderOptionName.REFRESHTOKEN.getKey(), refreshToken);
         map.put("username", dto.getUsername());
         map.put("redirectPage", redirectUri);
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+
+//        System.out.println("authentication 확인 : " + authentication);
+//
+//        System.out.println("인증됐는지 확인 : " + authentication.isAuthenticated());
+
+        if (!authentication.isAuthenticated()) {
+            System.out.println("로그인 실패");
+            return null;
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+//        return null;
 
         return new ResponseEntity<>(map, HttpStatus.OK);
 

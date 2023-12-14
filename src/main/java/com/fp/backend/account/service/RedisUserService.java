@@ -25,7 +25,7 @@ public class RedisUserService {
 
     public void accessTokenSave(String accessToken, String username) {
 
-        //레디스에 엑세스토큰 저장
+        //레디스에 엑세스토큰 저장(키: 엑세스 토큰, 값: 유저네임
         redisTemplate.opsForValue().set(username, accessToken);
 
 //        return new ResponseEntity<>(HttpStatus.OK);
