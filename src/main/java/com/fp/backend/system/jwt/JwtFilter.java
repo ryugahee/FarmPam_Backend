@@ -76,7 +76,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if ( //관리자 페이지의 요청이 들어왔다면
                 request.getRequestURI().equals("/api/item/marketValue") ||
                 request.getRequestURI().equals("/api/item/allMarketValues") ||
-                request.getRequestURI().equals("/api/getAllUsers")
+                request.getRequestURI().equals("/api/getAllUsers") ||
+                request.getRequestURI().equals("/api/additionalInfo")
 
         ) {
 
@@ -99,7 +100,7 @@ public class JwtFilter extends OncePerRequestFilter {
             ResponseEntity accessTokenResponseEntity = decideAccessTokenPath(accessToken);
 
             //중복 로그인 검증. 레디스에서 해당 엑세스 토큰이 일치하는지 확인
-            boolean result = redisUserService.accessTokenFind(accessToken);
+            boolean result = redisUserService.accessTokenCompare(accessToken);
 
 
             System.out.println("중복 로그인 검증 결과 : " + result);

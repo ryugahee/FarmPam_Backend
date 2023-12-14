@@ -12,6 +12,7 @@ import com.fp.backend.account.service.UserService;
 
 import com.fp.backend.account.sms.SmsUtil;
 import com.fp.backend.system.config.redis.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -105,11 +106,26 @@ public class MemberController {
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
+
+    //간편 로그인 유저 추가 정보 입력
+    @PostMapping("/additionalInfo")
+    public ResponseEntity<?> additionalRegister(@RequestBody SignupDto dto, HttpServletRequest request) {
+
+        System.out.println("간편 로그인 유저 추가 정보 입력 컨트롤러 진입");
+
+       String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+
+       userService.addtionalRegister(dto, accessToken);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
     //휴대폰 인증 번호 요청
     @PostMapping("/checkPhoneNumber")
     public String phoneCheck(@RequestBody String phoneNumber) {
 
-        System.out.println("휴대폰 번호 인증 컨트롤러 작동");
+        System.out.println("휴대폰 인증번호 발송 컨트롤러 작동 : " + phoneNumber);
 
         userService.userPhoneCheck(phoneNumber);
 

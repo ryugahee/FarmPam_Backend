@@ -186,6 +186,35 @@ public class UserService {
 
     }
 
+    //간편 로그인 유저 추가 정보 입력
+    public void addtionalRegister(SignupDto dto, String accessToken) {
+
+      String username = redisUserService.findUsernameByAccessToken(accessToken);
+
+        System.out.println("유저네임 확인 : " + username);
+
+        //추가 정보를 입력했으니, ROLE을 GUEST에서 USER로 교체
+        authoritiesRepository.updateAuthorityByUsername(username, AuthorityName.USER.getKey());
+
+       Optional<Users> user = userRepository.findByUsername(username);
+
+        if (user.isPresent()) {
+          Users updateUser =  Users.builder()
+                  .username(user.get().getUsername())
+                  .password(user.get().getPassword())
+                  .realName(dto.getRealName())
+//                  .nickname(user.get().getNickname())
+                  .phoneNumber(dto.getPhoneNumber())
+                  .age(dto.getAge())
+                  .mailCode(dto.getMailCode())
+                  .streetAddress(dto.getStreetAddress())
+                  .detailAddress(dto.getDetailAddress())
+                .build();
+
+            userRepository.save(updateUser);
+        }
+    }
+
 
     //휴대폰 인증번호 전송
     public void userPhoneCheck(String phoneNumber) {
@@ -198,7 +227,7 @@ public class UserService {
 
         redisUserService.smsCodeSave(Integer.toString(randomNumber), phoneNumber);
 
-        smsUtil.sendOne(phoneNumber, randomNumber);
+//        smsUtil.sendOne(phoneNumber, randomNumber);
     }
 
     //인증번호 확인 비교

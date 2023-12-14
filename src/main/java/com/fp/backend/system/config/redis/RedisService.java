@@ -19,8 +19,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
 
-
-    @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -106,10 +104,23 @@ public class RedisService {
     }
 
     //레디스에서 동일한 엑세스토큰이 있는지 조회
-    public boolean accessTokenFind(String accessToken) {
+    public boolean accessTokenCompare(String accessToken) {
         String redisAccessToken = (String) redisTemplate.opsForValue().get(accessToken);
 
-        return redisAccessToken.isEmpty();
+//        System.out.println("레디스 엑세스 토큰 결과값 : " + redisAccessToken);
+
+        return !redisAccessToken.isEmpty();
+
+    }
+
+    //엑세스 토큰으로 유저 이름 구하기
+    public String findUsernameByAccessToken(String accessToken) {
+
+        String tokenWithoutBearer = accessToken.replace("Bearer ", "");
+
+//        System.out.println("흠??????" + (String) redisTemplate.opsForValue().get(tokenWithoutBearer));
+
+        return  (String) redisTemplate.opsForValue().get(tokenWithoutBearer);
 
     }
 
@@ -123,7 +134,12 @@ public class RedisService {
     //sms인증번호 저장
     public void smsCodeSave(String smsCode, String phoneNumber) {
 
+        System.out.println("휴대폰 저장할 때 번호는? : " + phoneNumber);
+        System.out.println("휴대폰 저장할 때 인증번호는? : " + smsCode);
+
         redisTemplate.opsForValue().set(phoneNumber, smsCode);
+
+        redisTemplate.expire(phoneNumber, 60, TimeUnit.SECONDS);
     }
 
 

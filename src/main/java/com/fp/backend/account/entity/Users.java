@@ -33,6 +33,8 @@ public class Users implements UserDetails, OAuth2User {
 
     private String nickname;
 
+    private String phoneNumber;
+
     private Integer age;
 
     private String email;
