@@ -4,6 +4,7 @@ import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
 
 import com.fp.backend.auction.dto.ItemMarketValueDto;
+import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.service.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -101,13 +104,17 @@ public class ItemController {
     }
 
 
-    //날짜별 품목 시세
+    //시세 검색
     @PostMapping("/item/marketValue")
     public ResponseEntity<Map<String, List<?>>> getItemMarketValue(@RequestBody ItemMarketValueDto itemType) {
 
         System.out.println("시세 검색 컨트롤러 진입");
 
         System.out.println("키워드 확인 : " + itemType.getItemType());
+
+        if (itemType.getItemType().equals("")) {
+          return getAllMarketValues(0);
+        }
 
         Map<String, List<?>> marketValues = itemService.searchMarketValues(itemType.getItemType());
 
@@ -117,12 +124,23 @@ public class ItemController {
     }
 
 
+    //전체 시세 조회
     @GetMapping("/item/allMarketValues")
-    public ResponseEntity getAllMarketValues() {
+    public ResponseEntity<Map<String, List<?>>> getAllMarketValues(@RequestParam int pageNum) {
 
-        System.out.println("전체 시세 조회 컨트롤러 진입");
+        System.out.println("전체 시세 조회 컨트롤러 진입, 페이지: " + pageNum);
 
-        Map<String, List<?>> resultMap = itemService.getAllMarketValues();
+        Map<String, List<?>> resultMap = itemService.getAllMarketValues(pageNum);
+
+        int totalPage = itemService.findTotalPage();
+
+        System.out.println("토탈 페이지 : "+ totalPage);
+
+        List<Integer> totalPageList = new ArrayList<>();
+
+        totalPageList.add(totalPage);
+
+        resultMap.put("totalPage", totalPageList);
 
         return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
@@ -137,6 +155,16 @@ public class ItemController {
 
         return new ResponseEntity<>(sellerId, HttpStatus.OK);
     }
+
+    //관리자 페이지 진행중 경매 조회
+    @GetMapping("/item/getAuctionOngoing")
+    public ResponseEntity<Slice<Item>> auctionOngoing() {
+
+        Slice<Item> onGoingItems =  itemService.findAuctionOngoing();
+
+        return new ResponseEntity<>(onGoingItems, HttpStatus.OK);
+    }
+
 }
 
 

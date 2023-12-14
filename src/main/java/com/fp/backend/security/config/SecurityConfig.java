@@ -69,17 +69,13 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/login"),
                                         new AntPathRequestMatcher("/api/checkPhoneNumber"),
                                         new AntPathRequestMatcher("/api/userLogout"),
-                                        new AntPathRequestMatcher("/favicon.ico"),
-                                        new AntPathRequestMatcher("/api/item/new"),
-                                        new AntPathRequestMatcher("/api/item/list"),
-                                        new AntPathRequestMatcher("/item/delete/{itemId}"),
-                                        new AntPathRequestMatcher("/item/detail/{id}"),
-                                        new AntPathRequestMatcher("/item/detail/{id}/seller"),
-                                        new AntPathRequestMatcher("/api/nav/item/list")
+//                                        new AntPathRequestMatcher("/api/item/allMarketValues"),
+                                        new AntPathRequestMatcher("/api/item/marketValue"),
+                                        new AntPathRequestMatcher("/favicon.ico")
 
                                 ).permitAll()
-                                .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
 
                 .oauth2Login(oauth2 -> oauth2

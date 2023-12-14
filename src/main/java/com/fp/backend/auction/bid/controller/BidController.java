@@ -46,12 +46,10 @@ public class BidController {
 
         bidService.setValuesPush(bidId, content);
         return bidService.getValuesListAll(bidId);
-//        try{
-//            bidService.setValuesPush(bidId, (String) content);
-//            return bidService.getValuesListAll(bidId);
-//        }catch (Exception e){
-//            return bidService.getValuesListAll(bidId);
-//        }
+    }
+
+    public void bidTimeCtrl(){
+
     }
 
 
