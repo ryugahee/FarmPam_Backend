@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+
+files:
+  # CodeDeploy agent가 다운로드 받은 코드에서 어느 경로를 다운 받을지 결정(/ -> 전체 파일을 받는다.)
+  - source: /
+    # EC2 서버에서 어느 경로에 해당 코드를 저장할지 결정
+    destination: /home/ubuntu/cicdproject
+
+permissions:
+  - object: /home/ec2-user/cicdproject/
+    owner: ec2-user
+    group: ec2-user
+
+# 수명 주기
+hooks:
+  # install이 끝났을 때
+  AfterInstall:
+    # scripts에 deploy.sh라는 쉘 스크립트를 실행 시켜
+    - location: scripts/deploy.sh
+      timeout: 60
+      runas: ec2-user
