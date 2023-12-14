@@ -112,11 +112,9 @@ public class ItemService {
         Slice<Item> itemList;
 
         System.out.println("타입: " + sortType);
-        System.out.println("타입: " + keyword);
-
+        System.out.println("키워드: " + keyword);
 
         if (keyword != "") {
-
             if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7);
                 itemList = this.itemRepository.findByKeywordAndTime(keyword, pageable);
@@ -128,6 +126,13 @@ public class ItemService {
             if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
+            } /*else if (sortType.equals("auctioning")) {
+                PageRequest pageable = PageRequest.of(page, 7);
+
+            } */else if (sortType.equals("completed")) {
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findCompletedItemsOrderedByIdAsc(pageable);
+
             } else {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
@@ -145,14 +150,22 @@ public class ItemService {
                 itemImgDtoList.add(itemImgDto);
 
             }
+
             itemFormDto.setItemImgDtoList(itemImgDtoList);
 
-            if (!itemFormDto.getIsSoldout()) {
-            itemFormDtoList.add(itemFormDto);
+            if (sortType.equals("completed")) {
+                if (itemFormDto.getIsSoldout()) {
+                    itemFormDtoList.add(itemFormDto);
+                }
+            } else {
+                if (!itemFormDto.getIsSoldout()) {
+                    itemFormDtoList.add(itemFormDto);
+                }
             }
 
             System.out.println("시간: " + itemFormDto.getTime());
-            System.out.println("솔아: " + itemFormDto.getIsSoldout());
+            System.out.println("판매여부: " + itemFormDto.getIsSoldout());
+
 
         }
         return itemFormDtoList;

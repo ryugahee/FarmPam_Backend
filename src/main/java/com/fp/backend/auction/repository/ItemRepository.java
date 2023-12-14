@@ -18,6 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
    //최신
     Slice<Item> findByIsSoldoutFalseOrderByIdDesc(PageRequest pageable);
 
+
     //스케줄러
     List<Item> findByTimeLessThan(long currentTimeMillis);
 
@@ -40,6 +41,11 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "AND i.isSoldout = false " +
             "ORDER BY i.time ASC")
     Slice<Item> findByKeywordAndTime(@Param("keyword") String keyword, PageRequest pageable);
+
+    //경매 완료
+//    Slice<Item> findByIsSoldoutTrueOrderByIdAsc(PageRequest pageable);
+    @Query("SELECT i FROM Item i WHERE i.isSoldout = true ORDER BY i.id ASC")
+    Slice<Item> findCompletedItemsOrderedByIdAsc(PageRequest pageable);
 
 }
 

@@ -69,7 +69,13 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/login"),
                                         new AntPathRequestMatcher("/api/checkPhoneNumber"),
                                         new AntPathRequestMatcher("/api/userLogout"),
-                                        new AntPathRequestMatcher("/favicon.ico")
+                                        new AntPathRequestMatcher("/favicon.ico"),
+                                        new AntPathRequestMatcher("/api/item/new"),
+                                        new AntPathRequestMatcher("/api/item/list"),
+                                        new AntPathRequestMatcher("/item/delete/{itemId}"),
+                                        new AntPathRequestMatcher("/item/detail/{id}"),
+                                        new AntPathRequestMatcher("/item/detail/{id}/seller"),
+                                        new AntPathRequestMatcher("/api/nav/item/list")
 
                                 ).permitAll()
                                 .anyRequest().authenticated()
@@ -112,9 +118,9 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-            http
-                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService), UsernamePasswordAuthenticationFilter.class)
-            ;
+//            http
+//                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService), UsernamePasswordAuthenticationFilter.class)
+//            ;
 
         }
     }
