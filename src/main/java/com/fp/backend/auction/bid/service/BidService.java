@@ -70,49 +70,49 @@ public class BidService {
         return stringList;
     }
 
-//    @Scheduled(fixedDelay = 36000*1000)
-//    @Transactional
-//    public void checkTime(){
-//        ScanOptions options = ScanOptions.scanOptions().match("*").count(100).build();
+    @Scheduled(fixedDelay = 36000*1000)
+    @Transactional
+    public void checkTime(){
+        ScanOptions options = ScanOptions.scanOptions().match("*").count(100).build();
+
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+//        Set<String> keys = redisTemplate.keys("*");
+        Cursor<String> keys = redisTemplate.scan(options);
+        List<String> timeList = new ArrayList<>();
+
+//        if (keys != null) {
+//            for(String key : keys){
+//                int index = key.indexOf(":");
+//                long bidIds = Long.valueOf(key.substring(index + 1));
+//                System.out.println("bidIds = " + bidIds);
+//                Object data = list.index(String.valueOf(bidIds), -1);
+//                System.out.println("data = " + data);
+//                bid = getInstance().fromJson((String) data, Bid.class);
+//                timeList.add(bid.getBidTime());
+//            }
+//            for(int i = 0; timeList.size() >= i; i++){
+//                long bidTime = Long.parseLong(timeList.get(i));
+//                if (bidTime <= currentTimeMillis()){
+//                    Item item = itemRepository.findById(Long.valueOf(timeList.get(i))).get();
+//                    item.setIsSoldout(true);
+//                    redisTemplate.delete(timeList.get(i));
+//                }
 //
-//        ListOperations<String, Object> list = redisTemplate.opsForList();
-////        Set<String> keys = redisTemplate.keys("*");
-//        Cursor<String> keys = redisTemplate.scan(options);
-//        List<String> timeList = new ArrayList<>();
-//
-////        if (keys != null) {
-////            for(String key : keys){
-////                int index = key.indexOf(":");
-////                long bidIds = Long.valueOf(key.substring(index + 1));
-////                System.out.println("bidIds = " + bidIds);
-////                Object data = list.index(String.valueOf(bidIds), -1);
-////                System.out.println("data = " + data);
-////                bid = getInstance().fromJson((String) data, Bid.class);
-////                timeList.add(bid.getBidTime());
-////            }
-////            for(int i = 0; timeList.size() >= i; i++){
-////                long bidTime = Long.parseLong(timeList.get(i));
-////                if (bidTime <= currentTimeMillis()){
-////                    Item item = itemRepository.findById(Long.valueOf(timeList.get(i))).get();
-////                    item.setIsSoldout(true);
-////                    redisTemplate.delete(timeList.get(i));
-////                }
-////
-////            }
-////        }
-//        while (keys.hasNext()){
-//            long bidIds = extractBidId(keys);
-//            System.out.println("bidIds = " + bidIds);
-//            Object data = list.index(String.valueOf(bidIds), -1);
-//            System.out.println("data = " + data);
-//            bid = getInstance().fromJson((String) data, Bid.class);
-//            timeList.add(bid.getBidTime());
+//            }
 //        }
-//
-//    }
-//    private Long extractBidId(Cursor<String> keys){
-//        String key = new String(keys.next());
-//        int index = key.indexOf(":");
-//        return Long.valueOf(key.substring(index + 1));
-//    }
+        while (keys.hasNext()){
+            long bidIds = extractBidId(keys);
+            System.out.println("bidIds = " + bidIds);
+            Object data = list.index(String.valueOf(bidIds), -1);
+            System.out.println("data = " + data);
+            bid = getInstance().fromJson((String) data, Bid.class);
+            timeList.add(bid.getBidTime());
+        }
+
+    }
+    private Long extractBidId(Cursor<String> keys){
+        String key = new String(keys.next());
+        int index = key.indexOf(":");
+        return Long.valueOf(key.substring(index + 1));
+    }
 }
