@@ -3,6 +3,7 @@ package com.fp.backend.system.config.redis;
 import com.fp.backend.system.config.websocket.SocketVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +18,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class RedisService {
-
-    private final StringRedisTemplate stringRedisTemplate;
-
+//
+//    @Qualifier("stringRedisTemplate")
+//    private final StringRedisTemplate stringRedisTemplate;
+    @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -41,7 +43,9 @@ public class RedisService {
     }
     public void setValuesPush(String key, String data){
         ListOperations<String, Object> list = redisTemplate.opsForList();
+
         list.leftPush(key, data);
+        System.out.println("data = " + data);
     }
     public String getValuesLastIndex(String key){
         ListOperations<String, Object> list = redisTemplate.opsForList();
@@ -96,14 +100,14 @@ public class RedisService {
     //레디스에 엑세스토큰 저장
     public void accessTokenSave(String accessToken, String username) {
 
-        stringRedisTemplate.opsForValue().set(username, accessToken);
+        redisTemplate.opsForValue().set(username, accessToken);
 
 //        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //레디스에서 동일한 엑세스토큰이 있는지 조회
     public boolean accessTokenFind(String accessToken, String username) {
-        String redisAccessToken = stringRedisTemplate.opsForValue().get(username);
+        String redisAccessToken = (String) redisTemplate.opsForValue().get(username);
 
         return redisAccessToken.equals(accessToken);
 
@@ -112,21 +116,21 @@ public class RedisService {
     //레디스에서 엑세스토큰 삭제
     public void accessTokenDelete(String username) {
 
-        stringRedisTemplate.delete(username);
+        redisTemplate.delete(username);
 
     }
 
     //sms인증번호 저장
     public void smsCodeSave(String smsCode, String phoneNumber) {
 
-        stringRedisTemplate.opsForValue().set(phoneNumber, smsCode);
+        redisTemplate.opsForValue().set(phoneNumber, smsCode);
     }
 
 
     //sms인증번호 일치 비교
     public boolean compareSMS(String userSMSCode, String phoneNumber) {
 
-        return stringRedisTemplate.opsForValue().get(phoneNumber).equals(userSMSCode);
+        return redisTemplate.opsForValue().get(phoneNumber).equals(userSMSCode);
     }
 
 

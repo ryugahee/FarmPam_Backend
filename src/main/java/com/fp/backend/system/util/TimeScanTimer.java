@@ -3,10 +3,15 @@ package com.fp.backend.system.util;
 import java.util.TimerTask;
 
 public class TimeScanTimer {
-    TimerTask task = new TimerTask() {
+
+
+
+
+    class CheckBidFinTime extends TimerTask{
+
         @Override
         public void run() {
 
         }
-    };
+    }
 }

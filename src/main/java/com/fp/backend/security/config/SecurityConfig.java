@@ -69,11 +69,13 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/login"),
                                         new AntPathRequestMatcher("/api/checkPhoneNumber"),
                                         new AntPathRequestMatcher("/api/userLogout"),
+//                                        new AntPathRequestMatcher("/api/item/allMarketValues"),
+                                        new AntPathRequestMatcher("/api/item/marketValue"),
                                         new AntPathRequestMatcher("/favicon.ico")
 
                                 ).permitAll()
-                                .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
 
                 .oauth2Login(oauth2 -> oauth2
@@ -112,9 +114,9 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-            http
-                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService), UsernamePasswordAuthenticationFilter.class)
-            ;
+//            http
+//                    .addFilterBefore(new JwtFilter(tokenProvider, redisUserService), UsernamePasswordAuthenticationFilter.class)
+//            ;
 
         }
     }

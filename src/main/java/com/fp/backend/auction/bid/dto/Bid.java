@@ -18,9 +18,13 @@ public class Bid {
     @SerializedName("bidPrice")
     @Expose
     private String bidPrice;
+    @SerializedName("bidTime")
+    @Expose
+    private String bidTime;
 
-    public Bid(String userName, String bidPrice){
+    public Bid(String userName, String bidPrice, String bidTime){
         this.userName = userName;
         this.bidPrice = bidPrice;
+        this.bidTime = bidTime;
     }
 }

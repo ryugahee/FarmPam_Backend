@@ -1,60 +1,54 @@
 package com.fp.backend.system.config.redis;
 
-
-import org.springframework.beans.factory.annotation.Value;
+import com.google.api.client.util.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.data.redis.host_bid}")
     private String redisHost;
-    @Value("${spring.data.redis.port}")
+    @Value("${spring.data.redis.port_bid}")
     private int redisPort;
+    @Value("${spring.data.redis.host_Token}")
+    private String redisHost_Token;
+    @Value("${spring.data.redis.port_Token}")
+    private int redisPort_Token;
+
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory(){
-        return new LettuceConnectionFactory(redisHost, redisPort);
+    public RedisConnectionFactory redisConnectionFactory_Bid(){
+        return new LettuceConnectionFactory("localhost", 6379);
+    }@Bean
+    public RedisConnectionFactory redisConnectionFactory_Token(){
+        return new LettuceConnectionFactory("localhost", 6378);
     }
     @Bean
     public RedisTemplate<?, ?> redisTemplate(){
         RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory_Bid());
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory_Bid());
 
         return redisTemplate;
     }
-//    @Bean
-//    public RedisMessageListenerContainer redisMessageListenerContainer(
-//            RedisConnectionFactory connectionFactory,
-//            MessageListenerAdapter listenerAdapter,
-//            ChannelTopic channelTopic){
-//        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-//
-//        container.setConnectionFactory(connectionFactory);
-//        container.addMessageListener(listenerAdapter, channelTopic);
-//
-//        return container;
-//    }
+    @Bean
+    public RedisTemplate<?, ?> redisTemplate_Token(){
+        RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory_Token());
 
-//    @Bean
-//    public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber){
-//        return new MessageListenerAdapter(subscriber, "onMessage");
-//    }
-//    @Bean
-//    public ChannelTopic channelTopic(){
-//        return new ChannelTopic("bid01");
-//    }
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setConnectionFactory(redisConnectionFactory_Token());
 
+        return redisTemplate;
+    }
 }

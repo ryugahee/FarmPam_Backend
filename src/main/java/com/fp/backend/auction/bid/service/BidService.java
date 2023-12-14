@@ -1,24 +1,30 @@
 package com.fp.backend.auction.bid.service;
 
 import com.fp.backend.auction.bid.dto.Bid;
+import com.fp.backend.auction.entity.Item;
+import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static java.lang.System.currentTimeMillis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BidService {
+    @Qualifier("redisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ItemRepository itemRepository;
     private static Gson gson;
     private static Bid bid;
     public static synchronized  Gson getInstance(){
@@ -62,4 +68,32 @@ public class BidService {
 
         return stringList;
     }
+
+
+    @Scheduled(fixedDelay = 10*1000)
+    @Transactional
+    public void checkTime(){
+        ListOperations<String, Object> list = redisTemplate.opsForList();
+        Set<String> keys = redisTemplate.keys("*");
+        if (keys != null) {
+            for(String key : keys){
+                int index = key.indexOf(":");
+                long bidIds = Long.valueOf(key.substring(index + 1));
+                System.out.println("bidIds = " + bidIds);
+                Object data = list.index(String.valueOf(bidIds), -1);
+                System.out.println("data = " + data);
+
+                System.out.println("nowTime = " + currentTimeMillis());
+                bid = getInstance().fromJson((String) data, Bid.class);
+                long bidTime = Long.parseLong(bid.getBidTime());
+                if(bidTime <= currentTimeMillis()){
+                    Item item = itemRepository.findById(bidIds)
+                            .orElseThrow(IllegalAccessError::new);
+                    item.setIsSoldout(true);
+                    itemRepository.save(item);
+                }
+                redisTemplate.delete(String.valueOf(bidIds));
+            }
+        }
+  }
 }
