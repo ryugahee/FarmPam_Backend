@@ -54,6 +54,7 @@ public class UserService {
                     .email(dto.getEmail())
                     .nickname(dto.getNickname())
                     .enabled(true)
+                    .farmMoney(0L)
                     .build();
 
             Authorities authorities = Authorities.builder()

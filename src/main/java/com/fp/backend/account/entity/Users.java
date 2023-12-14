@@ -45,6 +45,8 @@ public class Users implements UserDetails, OAuth2User {
 
     private String imageUrl;
 
+    private Long farmMoney;
+
 
     @Override
     public <A> A getAttribute(String name) {
