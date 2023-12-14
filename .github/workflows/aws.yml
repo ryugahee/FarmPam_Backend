@@ -1,32 +1,61 @@
 # workflow의 이름
-name: FarmPam Backend
+name: Build FarmPam Backend
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
+
+# 변수를 설정해서 사용 가능
+env:
+  # 버킷에 저장할 프로젝트 폴더명
+  PROJECT_NAME: farmpam-backend-project
+  # S3 생성 시 저장했던 이름
+  BUCKET_NAME: farmpam-back-dara-e
+  # CodeDeploy의 앱 이름
+  CODE_DEPLOY_APP_NAME: farmpam-deploy
+  # CodeDeploy의 배포 그룹 이름
+  DEPLOYMENT_GROUP_NAME: farmpam-cicd-group
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
+      # 체크아웃
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Set up JDK 17
+      # Java JDK 설치
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 17
+         java-version: 17
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
 
+      # 빌드 진행
       - name: Build with Gradle
         run: ./gradlew build
         shell: bash
+
+      # 압축 파일 생성
+      - name: Make Zip File
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
+
+      # 권한 부여
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      # S3로 업로드
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+
+      # CodeDeploy
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name $DEPLOYMENT_GROUP_NAME --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
