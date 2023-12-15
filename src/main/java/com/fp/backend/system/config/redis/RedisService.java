@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,12 +31,12 @@ public class RedisService {
     }
 
     //레디스에서 동일한 엑세스토큰이 있는지 조회
-    public boolean accessTokenCompare(String accessToken) {
-        String redisAccessToken = (String) redisTemplate_Token.opsForValue().get(accessToken);
+    public boolean accessTokenCompare(String username) {
+        String redisAccessToken = (String) redisTemplate_Token.opsForValue().get(username);
 
-//        System.out.println("레디스 엑세스 토큰 결과값 : " + redisAccessToken);
+        System.out.println("레디스 엑세스 토큰 결과값 : " + redisAccessToken);
 
-        return !redisAccessToken.isEmpty();
+        return redisAccessToken != null;
 
     }
 
@@ -59,13 +61,16 @@ public class RedisService {
     //sms인증번호 저장
     public void smsCodeSave(String smsCode, String phoneNumber) {
 
-
         System.out.println("휴대폰 저장할 때 번호는? : " + phoneNumber);
         System.out.println("휴대폰 저장할 때 인증번호는? : " + smsCode);
 
-//        redisTemplate.expire(phoneNumber, 60, TimeUnit.SECONDS);
+        try {
+            redisTemplate_Token.opsForValue().set(phoneNumber, smsCode);
+            redisTemplate_Token.expire(phoneNumber, 20, TimeUnit.SECONDS);
 
-        redisTemplate_Token.opsForValue().set(phoneNumber, smsCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 

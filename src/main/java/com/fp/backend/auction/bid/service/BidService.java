@@ -84,25 +84,25 @@ public class BidService {
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         Set<String> keys = redisTemplate_Bid.keys("*");
         if (keys != null) {
-            for(String key : keys){
-                int index = key.indexOf(":");
-                long bidIds = Long.valueOf(key.substring(index + 1));
-                System.out.println("bidIds = " + bidIds);
-                Object data = list.index(String.valueOf(bidIds), -1);
-                System.out.println("data = " + data);
-
-                System.out.println("nowTime = " + currentTimeMillis());
-                bid = getInstance().fromJson((String) data, Bid.class);
-                long bidTime = Long.parseLong(bid.getBidTime());
-                if(bidTime <= currentTimeMillis()){
-                    Item item = itemRepository.findById(bidIds)
-                            .orElseThrow(IllegalAccessError::new);
-                    item.setIsSoldout(true);
-                    itemRepository.save(item);
-                    redisTemplate_Bid.delete(String.valueOf(bidIds));
-                }
-
-            }
+//            for(String key : keys){
+//                int index = key.indexOf(":");
+//                long bidIds = Long.valueOf(key.substring(index + 1));
+//                System.out.println("bidIds = " + bidIds);
+//                Object data = list.index(String.valueOf(bidIds), -1);
+//                System.out.println("data = " + data);
+//
+//                System.out.println("nowTime = " + currentTimeMillis());
+//                bid = getInstance().fromJson((String) data, Bid.class);
+//                long bidTime = Long.parseLong(bid.getBidTime());
+//                if(bidTime <= currentTimeMillis()){
+//                    Item item = itemRepository.findById(bidIds)
+//                            .orElseThrow(IllegalAccessError::new);
+//                    item.setIsSoldout(true);
+//                    itemRepository.save(item);
+//                    redisTemplate_Bid.delete(String.valueOf(bidIds));
+//                }
+//
+//            }
         }
   }
 }

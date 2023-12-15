@@ -13,6 +13,7 @@ import com.fp.backend.account.sms.SmsUtil;
 import com.fp.backend.system.config.redis.RedisService;
 
 import com.fp.backend.system.jwt.TokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -187,37 +189,52 @@ public class UserService {
     }
 
     //간편 로그인 유저 추가 정보 입력
-    public void addtionalRegister(SignupDto dto, String accessToken) {
+    public ResponseEntity<?> addtionalRegister(SignupDto dto, String accessToken) {
 
-      String username = redisService.findUsernameByAccessToken(accessToken);
+//        String username = redisService.findUsernameByAccessToken(accessToken);
+
+        Users user = userRepository.findByPhoneNumber(dto.getPhoneNumber());
+
+        String username = user.getUsername();
 
         System.out.println("유저네임 확인 : " + username);
 
         //추가 정보를 입력했으니, ROLE을 GUEST에서 USER로 교체
         authoritiesRepository.updateAuthorityByUsername(username, AuthorityName.USER.getKey());
 
-       Optional<Users> user = userRepository.findByUsername(username);
+//        Optional<Users> user = userRepository.findByUsername(username);
 
-        if (user.isPresent()) {
-          Users updateUser =  Users.builder()
-                  .username(user.get().getUsername())
-                  .password(user.get().getPassword())
-                  .realName(dto.getRealName())
-//                  .nickname(user.get().getNickname())
-                  .phoneNumber(dto.getPhoneNumber())
-                  .age(dto.getAge())
-                  .mailCode(dto.getMailCode())
-                  .streetAddress(dto.getStreetAddress())
-                  .detailAddress(dto.getDetailAddress())
-                .build();
 
-            userRepository.save(updateUser);
+        //휴대폰 인증이 되어있지 않다면
+        if (!user.isPhoneCheck()) {
+
+            return new ResponseEntity<>("휴대폰 인증을 해주세요.", HttpStatus.BAD_REQUEST);
+
         }
+
+            Users updateUser = Users.builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .realName(dto.getRealName())
+                  .nickname(user.getNickname())
+//                  .phoneNumber(dto.getPhoneNumber())
+                    .age(dto.getAge())
+                    .mailCode(dto.getMailCode())
+                    .streetAddress(dto.getStreetAddress())
+                    .detailAddress(dto.getDetailAddress())
+                    .build();
+
+             userRepository.save(updateUser);
+
+             return new ResponseEntity<>(HttpStatus.OK);
+
+
+//        return null;
     }
 
 
     //휴대폰 인증번호 전송
-    public void userPhoneCheck(String phoneNumber) {
+    public void userPhoneCheck(String phoneNumber, String username) {
         Random random = new Random();
 
         // 1000부터 9999까지의 범위에서 랜덤 숫자 생성
@@ -225,7 +242,18 @@ public class UserService {
         int maxRange = 9999;
         int randomNumber = random.nextInt(maxRange - minRange + 1) + minRange;
 
+        //레디스에 인증번호 저장(1분)
         redisService.smsCodeSave(Integer.toString(randomNumber), phoneNumber);
+
+       Optional<Users> DBuser = userRepository.findByUsername(username);
+
+       Users user = Users.builder()
+                .username(DBuser.get().getUsername())
+                .password(DBuser.get().getPassword())
+                .phoneNumber(phoneNumber)
+                .build();
+
+        userRepository.save(user); // 입력한 유저 전화번호 저장
 
 //        smsUtil.sendOne(phoneNumber, randomNumber);
     }
@@ -238,6 +266,18 @@ public class UserService {
             return "인증번호를 다시 입력해주세요";
         }
 
+        //일치하면
+        Users user = userRepository.findByPhoneNumber(phoneNumber);
+
+        userRepository.save(
+                Users.builder()
+                        .username(user.getUsername())
+                        .password(user.getPassword())
+                        .phoneCheck(true) //휴대폰 인증 여부 바꾸기
+                        .phoneNumber(phoneNumber) //
+                        .build()
+        );
+
         return "";
 
     }
@@ -246,11 +286,42 @@ public class UserService {
     //모든 유저 가져오기
     public List<Users> getAllUser() {
 
-       List<Users> allUsers = userRepository.findAll();
+        List<Users> allUsers = userRepository.findAll();
 
         return allUsers;
     }
 
+    //유저 정보 불러오기
+    public Users getUserInfo(String username) {
+
+        Optional<Users> user = userRepository.findByUsername(username);
+
+        return user.get();
+
+    }
+
+    public void updateUserInfo(SignupDto dto, HttpServletRequest request) {
+
+        String usernameBefore = request.getHeader("username");
+
+        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
+        String username = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        Optional<Users> user = userRepository.findByUsername(username);
+
+        Users updatedUser = Users.builder()
+                .realName(dto.getRealName())
+                .nickname(dto.getNickname())
+                .phoneNumber(dto.getPhoneNumber())
+                .age(dto.getAge())
+                .email(dto.getEmail())
+                .mailCode(dto.getMailCode())
+                .streetAddress(dto.getStreetAddress())
+                .detailAddress(dto.getDetailAddress())
+
+                .build();
+
+    }
 
 
 }
