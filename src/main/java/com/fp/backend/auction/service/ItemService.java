@@ -5,6 +5,7 @@ package com.fp.backend.auction.service;
 import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.repository.UserRepository;
+import com.fp.backend.auction.bid.service.BidService;
 import com.fp.backend.auction.dto.ItemDetailFormDto;
 import com.fp.backend.auction.dto.ItemFormDto;
 import com.fp.backend.auction.dto.ItemImgDto;
@@ -15,7 +16,6 @@ import com.fp.backend.auction.repository.ItemImgRepository;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.auction.repository.ItemTagMapRepository;
 import com.fp.backend.auction.repository.MarketValueRepository;
-import com.fp.backend.system.config.redis.RedisService;
 
 import jakarta.persistence.EntityManager;
 
@@ -43,7 +43,7 @@ public class ItemService {
     private final ItemTagMapRepository itemTagMapRepository;
     private final ItemImgService itemImgService;
     private final ItemTagMapService itemTagMapService;
-    private final RedisService redisService;
+    private final BidService bidService;
 
     private final EntityManager entityManager;
 
@@ -100,7 +100,7 @@ public class ItemService {
 
         System.out.println("Register Data = " + data);
 
-        redisService.setValuesPush(Id, data);
+        bidService.setBidPush(Id, data);
 
         return item.getId();
     }
