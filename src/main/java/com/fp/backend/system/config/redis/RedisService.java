@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
 
+    @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -139,7 +140,7 @@ public class RedisService {
 
         redisTemplate.opsForValue().set(phoneNumber, smsCode);
 
-        redisTemplate.expire(phoneNumber, 60, TimeUnit.SECONDS);
+//        redisTemplate.expire(phoneNumber, 60, TimeUnit.SECONDS);
     }
 
 
