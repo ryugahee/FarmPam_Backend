@@ -105,4 +105,8 @@ public class Users implements UserDetails, OAuth2User {
     public String getName() {
         return this.username;
     }
+
+    public void updateFarmMoney(Long farmMoney) {
+        this.farmMoney += farmMoney;
+    }
 }
