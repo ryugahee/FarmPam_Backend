@@ -18,7 +18,7 @@ import java.util.List;
 public class Item extends BaseEntity {
 
     @Column(name="item_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
