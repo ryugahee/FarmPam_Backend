@@ -56,6 +56,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
+      - name: Check File
+        run:
+          pwd
+          ls -al ./build/libs
+        shell: bash
+
       # S3로 업로드
 #      - name: Upload to S3
 #        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
