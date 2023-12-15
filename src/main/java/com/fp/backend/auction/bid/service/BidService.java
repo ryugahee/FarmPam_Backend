@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -35,12 +34,7 @@ public class BidService {
         return gson;
     }
 
-    public String currentPrice(String key){
-        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
-        Object currentObject = list.index(key, 0);
-        bid = getInstance().fromJson((String) currentObject, Bid.class);
-        return bid.getBidPrice();
-    }
+
     public void setBidPush(String key, String data){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
 
@@ -57,6 +51,7 @@ public class BidService {
         System.out.println("bidPrice = " + bidPrice);
         Object currentObject = list.index(key, 0);
         bid = getInstance().fromJson((String) currentObject, Bid.class);
+
         System.out.println("currentObject = " + bid.getBidPrice());
         int current = Integer.parseInt(bid.getBidPrice());
         if (current < bidPrice){
@@ -68,6 +63,8 @@ public class BidService {
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         return (String) list.index(key, 0);
     }
+
+
     @Transactional(readOnly = true)
     public List<SocketVO> getValuesListAll(String key){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
@@ -77,15 +74,26 @@ public class BidService {
             Object data = list.index(key, i);
             System.out.println("data = " + data);
             bid = getInstance().fromJson((String) data, Bid.class);
+            System.out.println("bid.getBidId() = " + bid.getBidId());
             System.out.println("bidData = " + bid.getUserName());
             System.out.println("bid.getBidPrice() = " + bid.getBidPrice());
             SocketVO socketVO = new SocketVO(key, bid.getBidPrice());
             stringList.add(socketVO);
         }
-
         return stringList;
     }
-
+    public Bid currentPrice(String key){
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+        Object currentObject = list.index(key, 0);
+        bid = getInstance().fromJson((String) currentObject, Bid.class);
+        System.out.println(bid.getBidId());
+        Bid currentBid = new Bid();
+        currentBid.setBidId(key);
+        currentBid.setBidPrice(bid.getBidPrice());
+        System.out.println("currentBid.getBidId() = " + currentBid.getBidId());
+        System.out.println("currentBid.getBidPrice() = " + currentBid.getBidPrice());
+        return currentBid;
+    }
     @Scheduled(fixedDelay = 10*1000)
     @Transactional
     public void checkTime(){
