@@ -22,8 +22,9 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class BidService {
-    @Qualifier("redisTemplate")
-    private final RedisTemplate<String, Object> redisTemplate;
+
+    @Qualifier("redisTemplate_Bid")
+    private final RedisTemplate<String, Object> redisTemplate_Bid;
     private final ItemRepository itemRepository;
     private static Gson gson;
     private static Bid bid;
@@ -31,8 +32,16 @@ public class BidService {
         if(gson == null) gson = new Gson();
         return gson;
     }
+
+    public void setBidPush(String key, String data){
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+
+        list.leftPush(key, data);
+        System.out.println("data = " + data);
+    }
+
     public void setValuesPush(String key, Object data){
-        ListOperations<String, Object> list = redisTemplate.opsForList();
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         bid = getInstance().fromJson((String) data, Bid.class);
         int bidPrice = Integer.parseInt(bid.getBidPrice());
 
@@ -48,12 +57,12 @@ public class BidService {
     }
 
     public String getValuesLastIndex(String key){
-        ListOperations<String, Object> list = redisTemplate.opsForList();
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         return (String) list.index(key, 0);
     }
     @Transactional(readOnly = true)
     public List<SocketVO> getValuesListAll(String key){
-        ListOperations<String, Object> list = redisTemplate.opsForList();
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         List<SocketVO> stringList = new ArrayList<>();
         List<Object> bidList = list.range(key, 0, -1);
         for(int i = bidList.size()-1; i >= 0; i--){
@@ -69,12 +78,11 @@ public class BidService {
         return stringList;
     }
 
-
     @Scheduled(fixedDelay = 10*1000)
     @Transactional
     public void checkTime(){
-        ListOperations<String, Object> list = redisTemplate.opsForList();
-        Set<String> keys = redisTemplate.keys("*");
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+        Set<String> keys = redisTemplate_Bid.keys("*");
         if (keys != null) {
             for(String key : keys){
                 int index = key.indexOf(":");
@@ -91,8 +99,9 @@ public class BidService {
                             .orElseThrow(IllegalAccessError::new);
                     item.setIsSoldout(true);
                     itemRepository.save(item);
+                    redisTemplate_Bid.delete(String.valueOf(bidIds));
                 }
-                redisTemplate.delete(String.valueOf(bidIds));
+
             }
         }
   }
