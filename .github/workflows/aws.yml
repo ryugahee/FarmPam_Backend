@@ -7,8 +7,6 @@ on:
 
 # 변수를 설정해서 사용 가능
 env:
-  # 버킷에 저장할 프로젝트 폴더명
-  PROJECT_NAME: farmpam-backend-project
   # S3 생성 시 저장했던 이름
   BUCKET_NAME: farmpam-back-dara-e
   # CodeDeploy의 앱 이름
@@ -45,7 +43,7 @@ jobs:
 
       # 압축 파일 생성
       - name: Make Zip File
-        run: zip -qq -r ./$GITHUB_SHA.zip .
+        run: zip -qq -r ./backend.zip .
         shell: bash
 
       # 권한 부여
@@ -66,11 +64,13 @@ jobs:
 
       # S3로 업로드
       - name: Upload to S3
-        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+#        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$GITHUB_SHA.zip
 #      - name: Upload to S3
-#        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/$PROJECT_NAME/backend-0.0.1-SNAPSHOT-plain.jar
+#        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/backend-0.0.1-SNAPSHOT-plain.jar
+        run: aws s3 cp --region us-west-2 ./backend.zip s3://$BUCKET_NAME/ --recursive --acl private
+
 
 
       # CodeDeploy
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name $DEPLOYMENT_GROUP_NAME --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
+        run: aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name $DEPLOYMENT_GROUP_NAME --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=backend.zip
