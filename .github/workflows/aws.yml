@@ -44,8 +44,8 @@ jobs:
           arguments: build
 
       # 압축 파일 생성
-      - name: Make Zip File
-        run: zip -qq -r ./$GITHUB_SHA.zip .
+      - name: Make tar File
+        run: tar -qq -r ./$GITHUB_SHA.tar .
         shell: bash
 
       # 권한 부여
