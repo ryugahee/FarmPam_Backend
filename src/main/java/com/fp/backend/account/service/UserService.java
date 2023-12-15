@@ -39,7 +39,7 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final AuthoritiesRepository authoritiesRepository;
-    private final RedisService redisUserService;
+    private final RedisService redisService;
     private final SmsUtil smsUtil;
 
     //회원가입
@@ -129,7 +129,7 @@ public class UserService {
         String accessToken = tokenProvider.createAccessToken();
 
         // RedisService에서 로그인 할 때 생성한 엑세스 토큰 저장하기
-        redisUserService.accessTokenSave(accessToken, dto.getUsername());
+        redisService.accessTokenSave(accessToken, dto.getUsername());
 
         String refreshToken = tokenProvider.createRefreshToken();
 
@@ -155,7 +155,7 @@ public class UserService {
         System.out.println("로그아웃 요청하는 유저네임 : " + username);
 
         //DB(Redis)에서 엑세스 토큰 삭제하는 로직
-        redisUserService.accessTokenDelete(username);
+        redisService.accessTokenDelete(username);
 
     }
 
@@ -169,7 +169,7 @@ public class UserService {
         int maxRange = 9999;
         int randomNumber = random.nextInt(maxRange - minRange + 1) + minRange;
 
-        redisUserService.smsCodeSave(Integer.toString(randomNumber), phoneNumber);
+        redisService.smsCodeSave(Integer.toString(randomNumber), phoneNumber);
 
         smsUtil.sendOne(phoneNumber, randomNumber);
     }
@@ -178,7 +178,7 @@ public class UserService {
     public String compareSMSCode(String userSMSCode, String phoneNumber) {
 
         //인증번호가 일치하지 않으면
-        if (!redisUserService.compareSMS(userSMSCode, phoneNumber)) {
+        if (!redisService.compareSMS(userSMSCode, phoneNumber)) {
             return "인증번호를 다시 입력해주세요";
         }
 

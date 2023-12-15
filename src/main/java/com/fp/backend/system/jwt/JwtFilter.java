@@ -37,44 +37,22 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        //헤더에서 유저네임 꺼내기
-        String username = request.getHeader("username");
-
-
-
         System.out.println("JwtFilter 작동");
 
         System.out.println("들어온 주소 확인 : " + request.getRequestURI());
-
-        Users user = Users.builder()
-                .username(username)
-                .password(PasswordUtil.generateRandomPassword())
-                .build();
-
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(user, null,
-                        authoritiesMapper.mapAuthorities(user.getAuthorities()));
 
         if (
                 request.getRequestURI().equals(ApiName.LOGIN.getKey()) ||
                         request.getRequestURI().equals(ApiName.SIGNUP.getKey()) ||
                         request.getRequestURI().equals(ApiName.LOGOUT.getKey()) ||
                         request.getRequestURI().equals("/api/checkPhoneNumber") ||
-
                         request.getRequestURI().equals("/favicon.ico")
-//                        ||
-//                        request.getRequestURI().equals("/api/item/allMarketValues") ||
-//                        request.getRequestURI().equals("/api/item/marketValue") ||
-//                        request.getRequestURI().equals("/api/item/new") ||
-//                        request.getRequestURI().equals("/api/item/getAuctionOngoing")
-
 
         ) {
             System.out.println("로그인/회원가입/로그아웃 요청이라 JwtFilter 통과!");
             filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
-
 
         //엑세스 토큰 추출
         String accessToken = tokenProvider
@@ -92,23 +70,18 @@ public class JwtFilter extends OncePerRequestFilter {
             boolean result = redisUserService.accessTokenFind(accessToken, request.getHeader("username"));
 
 
-            System.out.println("중복 로그인 검증 결과 : " + result);
-
-            System.out.println("엑세스 토큰 판단 결과 : " + accessTokenResponseEntity);
-
             if (accessTokenResponseEntity != null) {
                 // accessTokenResponseEntity null이 아니라면, 즉 액세스 토큰이 유효하지 않을 경우
                 response.setStatus(accessTokenResponseEntity.getStatusCodeValue()); // 상태 코드 설정
                 response.getWriter().write(accessTokenResponseEntity.getBody().toString()); // 응답 메시지 설정
-                return;
+
             }
 
             if (!result) {
 
-                System.out.println("로그아웃 처리를(중복로그인이라) 해야 하므로 엑세스 토큰 삭제");
-                //로그아웃 처리를 - 중복로그인이라 해야 하므로 엑세스 토큰 삭제
+                //로그아웃 처리를 해야 하므로 엑세스 토큰 삭제
                 redisUserService.accessTokenDelete(request.getHeader("username"));
-//                new ResponseEntity<>(MessageName.RE_LOGIN.getKey(), HttpStatus.UNAUTHORIZED);
+                new ResponseEntity<>(MessageName.RE_LOGIN.getKey(), HttpStatus.UNAUTHORIZED);
 
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
 
@@ -117,9 +90,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 return; // 메시지를 보낸 후에는 이후 로직을 실행하지 않고 종료
             }
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
-            return;
         } // 엑세스 토큰이 없다면 아래 계속 진행
 
 
@@ -133,13 +103,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
-
-
         /*
          * refreshTokenResponseEntity가 null 이라면(판단한 메소드의 리턴값이 null 이라면) 리프레시 토큰이 유효하다는 의미이므로,
          *엑세스 토큰 재발급(덮어쓰기) 및 리프레시 토큰을 갱신해야 함
          * */
+
+        //헤더에서 유저네임 꺼내기
+        String username = request.getHeader("username");
 
         //새 엑세스 토큰 생성
         String newAccessToken = tokenProvider.createAccessToken();
@@ -156,6 +126,14 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setHeader(HeaderOptionName.ACCESSTOKEN.getKey(), newAccessToken);
         response.setHeader(HeaderOptionName.REFRESHTOKEN.getKey(), newRefreshToken);
 
+        Users user = Users.builder()
+                .username(username)
+                .password(PasswordUtil.generateRandomPassword())
+                .build();
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(user, null,
+                        authoritiesMapper.mapAuthorities(user.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
