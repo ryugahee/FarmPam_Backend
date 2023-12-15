@@ -69,7 +69,7 @@ jobs:
 #      - name: Upload to S3
 #        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/backend-0.0.1-SNAPSHOT-plain.jar
 #        run: aws s3 cp --region us-west-2 ./backend.zip s3://$BUCKET_NAME/ --recursive --acl private
-        run: aws s3 cp backend.zip s3://$BUCKET_NAME/backend.zip --recursive --acl private --overwrite
+        run: aws s3 cp --region us-west-2 ./backend.zip s3://$BUCKET_NAME/backend.zip --recursive --acl private --overwrite
 
 
       # CodeDeploy
