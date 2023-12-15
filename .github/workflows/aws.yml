@@ -61,7 +61,7 @@ jobs:
         shell: bash
 
       - name: Check Files
-        run: ls -al
+        run: ls -al ./build/libs
         shell: bash
 
       # S3로 업로드
