@@ -43,3 +43,4 @@ application-mysql.properties
 
 ### AWS ###
 src/main/resources/aws.yml
+src/main/resources/application-oauth.yml
