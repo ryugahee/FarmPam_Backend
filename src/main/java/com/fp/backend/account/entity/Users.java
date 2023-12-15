@@ -45,6 +45,8 @@ public class Users implements UserDetails, OAuth2User {
 
     private String imageUrl;
 
+    private Long farmMoney;
+
 
     @Override
     public <A> A getAttribute(String name) {
@@ -102,5 +104,9 @@ public class Users implements UserDetails, OAuth2User {
     @Override
     public String getName() {
         return this.username;
+    }
+
+    public void updateFarmMoney(Long farmMoney) {
+        this.farmMoney += farmMoney;
     }
 }
