@@ -28,13 +28,13 @@ public class RedisConfig {
     private int redisPort_Token;
 
 
-    @Primary
+
     @Bean(name = "redisConnectionFactory_Bid")
     public RedisConnectionFactory redisConnectionFactory_Bid(){
         return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
-
+    @Primary
     @Bean(name = "redisConnectionFactory_Token")
     public RedisConnectionFactory redisConnectionFactory_Token(){
         return new LettuceConnectionFactory(redisHost_Token, redisPort_Token);
