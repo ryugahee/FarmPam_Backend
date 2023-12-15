@@ -46,6 +46,9 @@ jobs:
         run: zip -qq -r ./backend.zip .
         shell: bash
 
+      - name: Show Zip File Location
+        run: echo "Zip file is located at $(pwd)/backend.zip"
+
       # 권한 부여
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -53,7 +56,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-          audience: sts.amazonaws.com
 
 #      - name: Check Directory
 #        run: pwd
@@ -69,7 +71,7 @@ jobs:
 #      - name: Upload to S3
 #        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/backend-0.0.1-SNAPSHOT-plain.jar
 #        run: aws s3 cp --region us-west-2 ./backend.zip s3://$BUCKET_NAME/ --recursive --acl private
-        run: aws s3 cp --region us-west-2 backend.zip s3://$BUCKET_NAME/backend.zip --recursive --acl private
+        run: aws s3 cp --region us-west-2 s3://$BUCKET_NAME/backend.zip --recursive --acl private
 
 
       # CodeDeploy
