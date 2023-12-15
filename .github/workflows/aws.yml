@@ -44,8 +44,8 @@ jobs:
           arguments: build
 
 #      # 압축 파일 생성
-#      - name: Make tar File
-#        run: tar -czf $GITHUB_SHA.tar.gz .
+#      - name: Make Zip File
+#        run: zip -qq -r ./$GITHUB_SHA.zip .
 #        shell: bash
 
       # 권한 부여
@@ -59,10 +59,10 @@ jobs:
       # S3로 업로드
 #      - name: Upload to S3
 #        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
-      - name: Upload Jar to S3
-        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.jar s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.jar
+      - name: Upload to S3
+        run: aws s3 cp --region us-west-2 ./build/libs/$GITHUB_SHA.jar s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.jar
 
 
-        # CodeDeploy
+      # CodeDeploy
       - name: Code Deploy
         run: aws deploy create-deployment --application-name $CODE_DEPLOY_APP_NAME --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name $DEPLOYMENT_GROUP_NAME --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
