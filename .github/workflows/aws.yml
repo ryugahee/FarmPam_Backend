@@ -12,7 +12,7 @@ env:
   # S3 생성 시 저장했던 이름
   BUCKET_NAME: farmpam-back-dara-e
   # CodeDeploy의 앱 이름
-  CODE_DEPLOY_APP_NAME: farmpam-deploy
+  CODE_DEPLOY_APP_NAME: FarmPam-Deploy
   # CodeDeploy의 배포 그룹 이름
   DEPLOYMENT_GROUP_NAME: farmpam-cicd-group
 
