@@ -43,10 +43,10 @@ jobs:
         with:
           arguments: build
 
-#      # 압축 파일 생성
-#      - name: Make Zip File
-#        run: zip -qq -r ./$GITHUB_SHA.zip .
-#        shell: bash
+      # 압축 파일 생성
+      - name: Make Zip File
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
 
       # 권한 부여
       - name: Configure AWS credentials
@@ -56,19 +56,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
-      - name: Check Directory
-        run: pwd
-        shell: bash
-
-      - name: Check Files
-        run: ls -al ./build/libs
-        shell: bash
+#      - name: Check Directory
+#        run: pwd
+#        shell: bash
+#
+#      - name: Check Files
+#        run: ls -al ./build/libs
+#        shell: bash
 
       # S3로 업로드
-#      - name: Upload to S3
-#        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
       - name: Upload to S3
-        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/$PROJECT_NAME/backend-0.0.1-SNAPSHOT-plain.jar
+        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+#      - name: Upload to S3
+#        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/$PROJECT_NAME/backend-0.0.1-SNAPSHOT-plain.jar
 
 
       # CodeDeploy
