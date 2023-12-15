@@ -4,6 +4,7 @@ import com.fp.backend.account.common.AuthorityName;
 
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserDto;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
 

@@ -4,6 +4,7 @@ import com.fp.backend.account.common.AuthorityName;
 
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserDto;
 import com.fp.backend.account.entity.Authorities;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
@@ -54,6 +55,7 @@ public class UserService {
                     .email(dto.getEmail())
                     .nickname(dto.getNickname())
                     .enabled(true)
+                    .farmMoney(0L)
                     .build();
 
             Authorities authorities = Authorities.builder()
@@ -67,7 +69,6 @@ public class UserService {
 
 
             return ResponseEntity.ok().body("가입 성공");
-
         }
         return ResponseEntity.badRequest().body("가입 실패");
     }
@@ -195,5 +196,20 @@ public class UserService {
     }
 
 
+    public UserDto getUser(String username) {
+        Users users = userRepository.findById(username)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
+        return entityToDto(users);
+    }
+
+    private UserDto entityToDto(Users users) {
+        return UserDto.builder()
+                .name(users.getRealName())
+                .email(users.getEmail())
+                // TODO: users.getPhoneNumber() 로 돌릴 것
+                .phoneNumber("01000000000")
+                .nickname(users.getNickname())
+                .build();
+    }
 }
