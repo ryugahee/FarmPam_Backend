@@ -43,10 +43,10 @@ jobs:
         with:
           arguments: build
 
-      # 압축 파일 생성
-      - name: Make tar File
-        run: tar -czf $GITHUB_SHA.tar.gz .
-        shell: bash
+#      # 압축 파일 생성
+#      - name: Make tar File
+#        run: tar -czf $GITHUB_SHA.tar.gz .
+#        shell: bash
 
       # 권한 부여
       - name: Configure AWS credentials
