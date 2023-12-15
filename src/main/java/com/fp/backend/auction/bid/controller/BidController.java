@@ -22,6 +22,7 @@ public class BidController {
 
 
 
+
     @PostMapping("/bid-list")
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
@@ -35,6 +36,12 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
+    @GetMapping("/bidPost/{itemId}")
+    public String bidPostResponse(@PathVariable("itemId") String id){
+        String data = bidService.currentPrice(id);
+        System.out.println("currentBidPrice = " + data);
+        return data;
+    }
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
     public Object bidPush(@Payload SocketVO socketVO){

@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
+
 import static java.lang.System.currentTimeMillis;
 
 import java.util.ArrayList;
@@ -33,6 +35,12 @@ public class BidService {
         return gson;
     }
 
+    public String currentPrice(String key){
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+        Object currentObject = list.index(key, 0);
+        bid = getInstance().fromJson((String) currentObject, Bid.class);
+        return bid.getBidPrice();
+    }
     public void setBidPush(String key, String data){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
 
