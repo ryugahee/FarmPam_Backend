@@ -56,10 +56,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
-      - name: Check File
-        run:
-          pwd
-          ls -al ./build/libs
+      - name: Check Directory
+        run: pwd
+        shell: bash
+
+      - name: Check Files
+        run: ls -al
         shell: bash
 
       # S3로 업로드
