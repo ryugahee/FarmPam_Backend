@@ -12,6 +12,9 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @Controller
 @RequiredArgsConstructor
@@ -53,6 +56,11 @@ public class BidController {
 
         bidService.setValuesPush(bidId, content);
         return bidService.getValuesListAll(bidId);
+    }
+    @MessageMapping("/bid-current")
+    @SendTo("/bidPost")
+    public List<Bid> bidPostCurrent(){
+        return bidService.currentBid();
     }
 
 }
