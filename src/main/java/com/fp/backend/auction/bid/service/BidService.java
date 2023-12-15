@@ -94,6 +94,28 @@ public class BidService {
         System.out.println("currentBid.getBidPrice() = " + currentBid.getBidPrice());
         return currentBid;
     }
+    public List<Bid> currentBid(){
+        ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+        List<Bid> allCurrentBid = new ArrayList<>();
+        Set<String> keys = redisTemplate_Bid.keys("*");
+        if (keys != null) {
+            for (String key : keys) {
+                int index = key.indexOf(":");
+                long bidIds = Long.valueOf(key.substring(index + 1));
+                System.out.println("bidIds = " + bidIds);
+                Object data = list.index(String.valueOf(bidIds), 0);
+                System.out.println("data = " + data);
+                bid = getInstance().fromJson((String) data, Bid.class);
+                Bid currentBid = new Bid();
+                currentBid.setBidId(key);
+                currentBid.setBidPrice(bid.getBidPrice());
+                allCurrentBid.add(currentBid);
+            }
+        }
+
+        return allCurrentBid;
+    }
+
     @Scheduled(fixedDelay = 10*1000)
     @Transactional
     public void checkTime(){
