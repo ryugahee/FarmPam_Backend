@@ -12,6 +12,9 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @Controller
 @RequiredArgsConstructor
@@ -22,11 +25,11 @@ public class BidController {
 
 
 
+
     @PostMapping("/bid-list")
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println("bidId = " + bidId);
         return bidService.getValuesListAll(bidId);
     }
     @PostMapping("/bid-finish/{itemId}")
@@ -35,57 +38,23 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
+    @GetMapping("/bidPost")
+    public Object bidPostResponse(){
+        return bidService.currentBid();
+    }
+
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
     public Object bidPush(@Payload SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println("bidId = " + bidId);
         Object content = socketVO.getContent();
-        System.out.println("content = " + content);
-
-
         bidService.setValuesPush(bidId, content);
         return bidService.getValuesListAll(bidId);
     }
-
-    public void bidTimeCtrl(){
-
+    @MessageMapping("/bid-current")
+    @SendTo("/bidPost")
+    public List<Bid> bidPostCurrent(){
+        return bidService.currentBid();
     }
 
-
-//
-//    @MessageMapping("/bid-update")
-//    @SendTo("/bidList")
-//    public SocketVO bidLastIndex(SocketVO socketVO){
-//        String bidId = socketVO.getBidId();
-//        System.out.println("IndexName = " + bidId);
-//        Object content = socketVO.getContent();
-//        System.out.println("IndexContent = " + content);
-//        System.out.println("bidID = " + socketVO.getBidId());
-//        return new SocketVO(bidId, content);
-//    }
-//    @MessageMapping("/bid-List")
-//    @SendTo("/bidList")
-//    public List<Object> bidList(String bidId){
-//        return redisService.getValuesListAll(bidId);
-//    }
-
-//    @PostMapping("/auction/detail")
-//    public bidDetail(){
-
-//    }
-
-//    @MessageMapping("/auction-bid")
-//    @SendTo("/bidList")
-//    public SocketVO pubBid(@Payload SocketVO socketVO){
-//
-//        String userName = socketVO.getUserName();
-//        System.out.println("userName = " + userName);
-//        String content = socketVO.getContent();
-//        System.out.println("content = " + content);
-//        redisService.setValuesPush(userName, content);
-//        System.out.println("data"+redisService.getValuesListAll(userName));
-//
-//        return new SocketVO(userName, content);
-//    }
 }

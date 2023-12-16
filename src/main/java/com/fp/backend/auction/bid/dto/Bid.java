@@ -12,6 +12,9 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Bid {
+    @SerializedName("bidId")
+    @Expose
+    private String bidId;
     @SerializedName("userName")
     @Expose
     private String userName;
@@ -22,7 +25,8 @@ public class Bid {
     @Expose
     private String bidTime;
 
-    public Bid(String userName, String bidPrice, String bidTime){
+    public Bid(String bidId, String userName, String bidPrice, String bidTime){
+        this.bidId = bidId;
         this.userName = userName;
         this.bidPrice = bidPrice;
         this.bidTime = bidTime;
