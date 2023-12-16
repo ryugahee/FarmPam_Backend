@@ -1,22 +1,18 @@
 package com.fp.backend.account.controller;
 
 import com.fp.backend.account.common.AuthorityName;
-
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
 import com.fp.backend.account.dto.UserDto;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
-
 import com.fp.backend.account.service.UserService;
-
 import com.fp.backend.account.sms.SmsUtil;
 import com.fp.backend.system.config.redis.RedisService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -131,15 +127,17 @@ public class MemberController {
     @GetMapping("/getAllUsers")
     public ResponseEntity getAllMember() {
 
-       List<Users> allUsers = userService.getAllUser();
+        List<Users> allUsers = userService.getAllUser();
 
         System.out.println(allUsers);
 
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
+        return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
+    }
 
-
-  
 
 }

@@ -210,6 +210,7 @@ public class UserService {
                 // TODO: users.getPhoneNumber() 로 돌릴 것
                 .phoneNumber("01000000000")
                 .nickname(users.getNickname())
+                .farmMoney(users.getFarmMoney())
                 .build();
     }
 }
