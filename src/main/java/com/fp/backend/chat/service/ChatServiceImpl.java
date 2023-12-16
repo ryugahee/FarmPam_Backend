@@ -62,8 +62,7 @@ public class ChatServiceImpl implements ChatService {
             // 상대방 찾기
             String receiverId = getReceiverId(chat, userId);
 
-            Users receiver = userRepository.findById(receiverId)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
+            Users receiver = getUser(receiverId);
 
             // 경매 정보 찾기
             Item item = getItem(chat.getItemId());
@@ -94,6 +93,11 @@ public class ChatServiceImpl implements ChatService {
         return result;
     }
 
+    private Users getUser(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
+    }
+
     private ChatMessage getLastChatMessage(List<ChatMessage> chatMessages) {
         if (hasNotMessage(chatMessages)) {
             return ChatMessage.builder()
@@ -119,8 +123,7 @@ public class ChatServiceImpl implements ChatService {
 
         String receiverId = getReceiverId(chat, userId);
 
-        Users receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
+        Users receiver = getUser(receiverId);
 
         // 경매 정보 찾기
         Item item = getItem(chat.getItemId());
