@@ -24,7 +24,7 @@ public class Users implements UserDetails, OAuth2User {
     @Column(length = 50, nullable = false)
     private String username;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 1000000, nullable = true)
     private String password;
 
     private boolean enabled;

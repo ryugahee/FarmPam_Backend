@@ -4,6 +4,7 @@ import com.fp.backend.account.common.AuthorityName;
 
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserInfoDto;
 import com.fp.backend.account.entity.Authorities;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +44,7 @@ public class UserService {
     private final AuthoritiesRepository authoritiesRepository;
     private final RedisService redisService;
     private final SmsUtil smsUtil;
+    private final UserImgService userImgService;
 
     //회원가입
     public ResponseEntity<String> userSignUp(SignupDto dto) {
@@ -83,7 +86,7 @@ public class UserService {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
 
-        System.out.println("로그인 토큰 확인 : " + authenticationToken);
+//        System.out.println("로그인 토큰 확인 : " + authenticationToken);
 
         Map<String, String> map = new HashMap<>();
 
@@ -92,8 +95,6 @@ public class UserService {
         Optional<Users> user = userRepository.findByUsername(dto.getUsername());
 //
         System.out.println("유저 : " + user.toString());
-//
-        System.out.println("비밀번호 비교" + bCryptPasswordEncoder.encode(dto.getPassword()));
 
 
         if (userRoles.isEmpty()) { // role이 없다는 건 회원가입한 유저가 아니라는 뜻, 입력한 패스워드도 일치하지 않으면
@@ -119,7 +120,7 @@ public class UserService {
             }
         }
 
-        String userRole = "USER_ROLE";
+        String userRole = "ROLE_USER";
 
         if (isGuest) {
             System.out.println("사용자가 ROLE_GUEST를 가지고 있습니다.");
@@ -161,7 +162,7 @@ public class UserService {
 
 //        System.out.println("authentication 확인 : " + authentication);
 //
-//        System.out.println("인증됐는지 확인 : " + authentication.isAuthenticated());
+        System.out.println("인증됐는지 확인 : " + authentication.isAuthenticated());
 
         if (!authentication.isAuthenticated()) {
             System.out.println("로그인 실패");
@@ -177,11 +178,12 @@ public class UserService {
     }
 
     //로그아웃
-    public void userLogout(HttpServletResponse response) {
+    public void userLogout(HttpServletRequest request) {
 
-        String username = response.getHeader("username");
+        String usernameBefore = request.getHeader("username");
 
-        System.out.println("로그아웃 요청하는 유저네임 : " + username);
+        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
+        String username = new String(decodedBytes, StandardCharsets.UTF_8);
 
         //DB(Redis)에서 엑세스 토큰 삭제하는 로직
         redisService.accessTokenDelete(username);
@@ -300,26 +302,33 @@ public class UserService {
 
     }
 
-    public void updateUserInfo(SignupDto dto, HttpServletRequest request) {
+    //유저 정보 수정
+    public void updateUserInfo(UserInfoDto dto, HttpServletRequest request, MultipartFile imgFile) throws Exception {
 
-        String usernameBefore = request.getHeader("username");
 
-        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
-        String username = new String(decodedBytes, StandardCharsets.UTF_8);
 
-        Optional<Users> user = userRepository.findByUsername(username);
+//        Optional<Users> user = userRepository.findByUsername(username);
+//
+//
+//        Users updatedUser = Users.builder()
+//                .username(dto.getUsername())
+//                .password(user.get().getPassword())
+//                .realName(dto.getRealName())
+//                .nickname(dto.getNickname())
+//                .phoneNumber(dto.getPhoneNumber())
+//                .age(dto.getAge())
+//                .email(dto.getEmail())
+//                .mailCode(dto.getMailCode())
+//                .streetAddress(dto.getStreetAddress())
+//                .detailAddress(dto.getDetailAddress())
+//                .build();
+//
+//        userRepository.save(updatedUser);
 
-        Users updatedUser = Users.builder()
-                .realName(dto.getRealName())
-                .nickname(dto.getNickname())
-                .phoneNumber(dto.getPhoneNumber())
-                .age(dto.getAge())
-                .email(dto.getEmail())
-                .mailCode(dto.getMailCode())
-                .streetAddress(dto.getStreetAddress())
-                .detailAddress(dto.getDetailAddress())
+//      Optional<Users> DBuser =  userRepository.findByUsername(dto.getUsername());
 
-                .build();
+        userImgService.saveUserImg(dto, imgFile, request);
+
 
     }
 

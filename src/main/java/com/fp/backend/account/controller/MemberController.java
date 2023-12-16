@@ -4,6 +4,7 @@ import com.fp.backend.account.common.AuthorityName;
 
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserInfoDto;
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
 
@@ -14,6 +15,7 @@ import com.fp.backend.auction.dto.SMSVerificationDTO;
 import com.fp.backend.system.config.redis.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,10 +71,10 @@ public class MemberController {
 
     //로그아웃
     @PostMapping("/userLogout")
-    public void logout(HttpServletResponse response) {
+    public void logout(HttpServletRequest request) {
         System.out.println("로그아웃 요청");
 
-        userService.userLogout(response);
+        userService.userLogout(request);
 
     }
 
@@ -184,15 +186,20 @@ public class MemberController {
 
     //유저 정보 수정
     @PostMapping("/updateUserInfo")
-    public ResponseEntity<?> updateUserInfo(@RequestBody SignupDto dto,
-                                            HttpServletRequest request,
-                                            @RequestParam("file") MultipartFile imgFile) {
+    public ResponseEntity<?> updateUserInfo(
+            @Valid UserInfoDto dto,
+          HttpServletRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile imgFile
+    ) throws Exception {
 
         System.out.println("유저 수정 컨트롤러 진입");
+        System.out.println("들어온 유저 수정 데이터 확인: " + dto.toString());
 
-        System.out.println("들어온 유저 수정 데이터 확인 : " + dto.toString() + imgFile);
-
-        userService.updateUserInfo(dto, request);
+//        if (imgFile != null) {
+            System.out.println("이미지 파일 정보: " + imgFile.getOriginalFilename());
+            // 이미지 파일이 전송된 경우 처리할 내용
+//        }
+        userService.updateUserInfo(dto, request, imgFile);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
