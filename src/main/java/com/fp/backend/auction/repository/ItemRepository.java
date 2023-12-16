@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -47,6 +48,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i WHERE i.isSoldout = true ORDER BY i.id ASC")
     Slice<Item> findCompletedItemsOrderedByIdAsc(PageRequest pageable);
 
+
+    List<Item> findByIsSoldoutTrueAndTime(LocalDateTime epochSecond);
 }
 
 
