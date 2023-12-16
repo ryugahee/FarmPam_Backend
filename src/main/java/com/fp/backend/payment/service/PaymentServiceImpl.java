@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         log.info("결제 성공");
 
-        Users user = getUsers(paymentInfoDto.getUsername());
+        Users user = getUser(paymentInfoDto.getUsername());
 
         Payment payment = toEntity(user, paymentInfoDto.getPaymentInfo());
 
@@ -46,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         log.info("충전 내역 가져오기");
 
-        Users users = getUsers(username);
+        Users users = getUser(username);
 
         List<Payment> payments = paymentRepository.findAllByUsers(users);
 
@@ -61,8 +60,8 @@ public class PaymentServiceImpl implements PaymentService {
         return payment.getFailureMessage() == null;
     }
 
-    private Users getUsers(String username) {
+    private Users getUser(String username) {
         return userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("존재하지 않은 사용자입니다."));
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자를 찾으려고 합니다."));
     }
 }
