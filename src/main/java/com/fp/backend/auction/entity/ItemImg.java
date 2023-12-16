@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Table(name="item_img")
 @Getter @Setter
-public class ItemImg extends BaseEntity {
+public class ItemImg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

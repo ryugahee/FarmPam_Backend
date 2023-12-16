@@ -10,7 +10,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @Entity
 @Table(name = "item_tag_map")
-public class ItemTagMap extends BaseEntity {
+public class ItemTagMap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "item_tag")
-public class ItemTag extends BaseEntity {
+public class ItemTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

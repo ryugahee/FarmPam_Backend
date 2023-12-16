@@ -1,12 +1,15 @@
 package com.fp.backend.auction.repository;
 
 import com.fp.backend.auction.entity.Item;
+import com.fp.backend.user.dto.UserRankDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -49,6 +52,19 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
     List<Item> findByIsSoldoutTrueAndTime(long localDateTime);
+
+
+    //top3랭킹
+    @Query("SELECT NEW com.fp.backend.user.dto.UserRankDto(u.username, u.nickname, u.imageUrl, COUNT(i.id)) " +
+            "FROM Users u " +
+            "JOIN u.items i " +
+            "WHERE i.isSoldout = true " +
+            "AND i.regTime BETWEEN :startOfMonth AND :endOfMonth " +
+            "GROUP BY u.username, u.nickname, u.imageUrl " +
+            "ORDER BY COUNT(i.id) DESC")
+    List<UserRankDto> findItemCountDesc(@Param("startOfMonth") LocalDateTime startOfMonth,
+                                        @Param("endOfMonth") LocalDateTime endOfMonth,
+                                        Pageable pageable);
 }
 
 
