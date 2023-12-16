@@ -33,21 +33,19 @@ jobs:
         shell: bash
 
       # 빌드 진행
-#      - name: Build with Gradle
-#        run: ./gradlew build
-#        shell: bash
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
 
+      # jar 파일 생성
+      - name: Make jar File
+        run: gradle bootJar
+
       # 압축 파일 생성
       - name: Make Zip File
         run: zip -qq -r ./backend.zip .
         shell: bash
-
-      - name: Show Zip File Location
-        run: echo "Zip file is located at $(pwd)/backend.zip"
 
       # 권한 부여
       - name: Configure AWS credentials
@@ -57,20 +55,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
-#      - name: Check Directory
-#        run: pwd
-#        shell: bash
-#
-#      - name: Check Files
-#        run: ls -al ./build/libs
-#        shell: bash
-
       # S3로 업로드
       - name: Upload to S3
-#        run: aws s3 cp --region us-west-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$GITHUB_SHA.zip
-#      - name: Upload to S3
-#        run: aws s3 cp --region us-west-2 ./build/libs/backend-0.0.1-SNAPSHOT-plain.jar s3://$BUCKET_NAME/backend-0.0.1-SNAPSHOT-plain.jar
-#        run: aws s3 cp --region us-west-2 ./backend.zip s3://$BUCKET_NAME/ --recursive --acl private
         run: aws s3 cp ./backend.zip s3://$BUCKET_NAME/
 
 

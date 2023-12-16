@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin bash
 
 REPOSITORY=/home/runner/work/FarmPam_Backend/FarmPam_Backend
 cd $REPOSITORY
