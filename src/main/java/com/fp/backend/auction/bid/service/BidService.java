@@ -61,6 +61,19 @@ public class BidService {
             list.leftPush(key, data);
         }
     }
+    @Transactional(readOnly = true)
+    public List<BidVO> getMyBidPrice(String key, String userName){
+        List<BidVO> allBidList = getValuesListAll(key);
+        List<BidVO> myBidList = new ArrayList<>();
+        for(int i = 0; allBidList.size() <= i; i++){
+            BidVO bidVO = allBidList.get(i);
+            String BidListName = bidVO.getUserName();
+            if(BidListName.equals(userName)){
+                myBidList.add(bidVO);
+            }
+        }
+        return myBidList;
+    }
 
     public String getValuesLastIndex(String key){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
@@ -121,6 +134,10 @@ public class BidService {
 
         return allCurrentBid;
     }
+
+//    public Object myBidPrice(String key, Object data){
+//
+//    }
 
     @Scheduled(cron = "0 0 6 * * *")
     public void insertSeasonScheduler() {
