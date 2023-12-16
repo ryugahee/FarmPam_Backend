@@ -44,6 +44,15 @@ public class Item extends BaseEntity {
     @Column
     private Boolean isSoldout;
 
+    @Column
+    private int currentBidPrice;
+
+    @Column
+    private int lastBidPrice;
+
+    @Column
+    private String buyer;
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemTagMap> itemTagMapList = new ArrayList<>();
 

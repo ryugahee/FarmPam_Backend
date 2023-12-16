@@ -30,7 +30,6 @@ public class BidController {
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println("bidId = " + bidId);
         return bidService.getValuesListAll(bidId);
     }
     @PostMapping("/bid-finish/{itemId}")
@@ -39,21 +38,16 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
-    @GetMapping("/bidPost/{itemId}")
-    public Object bidPostResponse(@PathVariable("itemId") String id){
-        Object data = bidService.currentPrice(id);
-        System.out.println("currentBidPrice = " + data);
-        return data;
+    @GetMapping("/bidPost")
+    public Object bidPostResponse(){
+        return bidService.currentBid();
     }
+
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
     public Object bidPush(@Payload SocketVO socketVO){
         String bidId = socketVO.getBidId();
-        System.out.println("bidId = " + bidId);
         Object content = socketVO.getContent();
-        System.out.println("content = " + content);
-
-
         bidService.setValuesPush(bidId, content);
         return bidService.getValuesListAll(bidId);
     }
