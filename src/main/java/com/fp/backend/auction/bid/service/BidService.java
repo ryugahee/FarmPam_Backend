@@ -2,7 +2,9 @@ package com.fp.backend.auction.bid.service;
 
 import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidData;
+import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.entity.Item;
+import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
@@ -56,18 +58,22 @@ public class BidService {
 
 
     @Transactional(readOnly = true)
-    public List<SocketVO> getValuesListAll(String key){
+    public List<BidVO> getValuesListAll(String key){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
-        List<SocketVO> stringList = new ArrayList<>();
+        List<BidVO> stringList = new ArrayList<>();
         List<Object> bidList = list.range(key, 0, -1);
         for(int i = bidList.size()-1; i >= 0; i--){
             Object data = list.index(key, i);
             bid = getInstance().fromJson((String) data, Bid.class);
-            SocketVO socketVO = new SocketVO(key, bid.getBidPrice());
-            stringList.add(socketVO);
+            String bidUserName = bid.getUserName();
+            String bidPrice = bid.getBidPrice();
+
+            BidVO bidVO = new BidVO(key, bidUserName, bidPrice);
+            stringList.add(bidVO);
         }
         return stringList;
     }
+
     public void setBidRegistryInfo(String key, String userName, String minPrice, long endTime){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         BidData bidData = new BidData(userName, minPrice, endTime);
@@ -77,11 +83,12 @@ public class BidService {
 
     public Bid currentPrice(String key){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
-        Object currentObject = list.index(key, 0);
+        Object currentObject = list.index(key, -1);
         bid = getInstance().fromJson((String) currentObject, Bid.class);
         Bid currentBid = new Bid();
         currentBid.setBidId(key);
         currentBid.setBidPrice(bid.getBidPrice());
+        System.out.println("bid.getBidPrice() = " + bid.getBidPrice());
         return currentBid;
     }
     public List<Bid> currentBid(){
@@ -107,7 +114,9 @@ public class BidService {
     @Scheduled(cron = "0 0 6 * * *")
     public void insertSeasonScheduler() {
 
+
     }
+
     @Scheduled(fixedDelay = 10*1000)
     @Transactional
     @Async
@@ -133,14 +142,13 @@ public class BidService {
                 if(bidTime <= currentTimeMillis()){
                     item.setIsSoldout(true);
                     item.setLastBidPrice(Integer.parseInt(bid.getBidPrice()));
+                    item.setBuyer(bid.getUserName());
                     itemRepository.save(item);
                     redisTemplate_Bid.delete(String.valueOf(bidIds));
                 }else {
                     item.setCurrentBidPrice(Integer.parseInt(bid.getBidPrice()));
                     itemRepository.save(item);
                 }
-
-
             }
         }
   }

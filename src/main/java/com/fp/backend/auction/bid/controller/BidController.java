@@ -38,10 +38,11 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
-    @GetMapping("/bidPost/{itemId}")
-    public Object bidPostResponse(@PathVariable("itemId") String id){
-        return bidService.currentPrice(id);
+    @GetMapping("/bidPost")
+    public Object bidPostResponse(){
+        return bidService.currentBid();
     }
+
     @MessageMapping("/bid-push")
     @SendTo("/bidList")
     public Object bidPush(@Payload SocketVO socketVO){
