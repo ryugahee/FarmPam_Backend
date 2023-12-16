@@ -5,7 +5,7 @@ cd $REPOSITORY
 
 # jar 파일 찾기
 APP_NAME=cicdproject
-JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT-plain.jar' | tail -n 1)
+JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar')
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
 # jar 파일 실행
