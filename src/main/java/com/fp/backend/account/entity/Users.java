@@ -109,4 +109,9 @@ public class Users implements UserDetails, OAuth2User {
     public void updateFarmMoney(Long farmMoney) {
         this.farmMoney += farmMoney;
     }
+
+    public Long payFarmMoney(Long amount) {
+        this.farmMoney -= amount;
+        return farmMoney;
+    }
 }

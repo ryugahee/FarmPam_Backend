@@ -47,6 +47,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i WHERE i.isSoldout = true ORDER BY i.id ASC")
     Slice<Item> findCompletedItemsOrderedByIdAsc(PageRequest pageable);
 
+
+    List<Item> findByIsSoldoutTrueAndTime(long localDateTime);
 }
 
 
