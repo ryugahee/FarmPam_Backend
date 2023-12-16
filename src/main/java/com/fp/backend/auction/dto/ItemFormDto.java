@@ -54,6 +54,9 @@ public class ItemFormDto {
             itemFormDto.setTime(0);
             itemFormDto.setIsSoldout(true);
         }
+
+        itemFormDto.setUserId(item.getUsers().getUsername());
+
         return itemFormDto;
 
     }
