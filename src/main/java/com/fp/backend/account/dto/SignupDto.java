@@ -17,6 +17,8 @@ public class SignupDto {
 
     private String nickname;
 
+    private String phoneNumber;
+
     private Integer age;
 
     private String email;

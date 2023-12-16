@@ -111,6 +111,9 @@ public class TokenProvider  implements InitializingBean {
 
     //헤더에서 엑세스토큰 꺼내기
     public Optional<String> extractAccessToken(HttpServletRequest request) {
+
+        System.out.println("헤더에서 엑세스 토큰 꺼내기 전 : " + request.getHeader("Authorization"));
+
         return Optional.ofNullable(request.getHeader("Authorization"))
                 .filter(refreshToken -> refreshToken.startsWith("Bearer "))
                 .map(refreshToken -> refreshToken.replace("Bearer ", ""));

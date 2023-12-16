@@ -137,6 +137,7 @@ public class BidService {
         Set<String> keys = redisTemplate_Bid.keys("*");
         if (keys != null) {
 
+
             for(String key : keys){
                 int index = key.indexOf(":");
                 long bidIds = Long.valueOf(key.substring(index + 1));
