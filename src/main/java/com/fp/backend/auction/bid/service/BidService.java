@@ -1,11 +1,15 @@
 package com.fp.backend.auction.bid.service;
 
+import com.fp.backend.account.entity.Users;
+import com.fp.backend.account.repository.UserRepository;
 import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.entity.Item;
 import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemRepository;
+import com.fp.backend.farmmoney.dto.SuccessfulBidDto;
+import com.fp.backend.farmmoney.service.FarmService;
 import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,7 @@ public class BidService {
     @Qualifier("redisTemplate_Bid")
     private final RedisTemplate<String, Object> redisTemplate_Bid;
     private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private static Gson gson;
     private static Bid bid;
     public static synchronized  Gson getInstance(){
@@ -40,13 +45,19 @@ public class BidService {
 
     public void setValuesPush(String key, Object data){
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+
+
         bid = getInstance().fromJson((String) data, Bid.class);
-        int bidPrice = Integer.parseInt(bid.getBidPrice());
+        long bidPrice = Long.parseLong(bid.getBidPrice());
+        String userName = bid.getUserName();
+        Users users = userRepository.findById(userName).orElseThrow(() -> new RuntimeException("사용자가 없습니다!"));
+        long farmMoney = users.getFarmMoney();
+
         Object currentObject = list.index(key, 0);
         bid = getInstance().fromJson((String) currentObject, Bid.class);
 
-        int current = Integer.parseInt(bid.getBidPrice());
-        if (current < bidPrice){
+        long current = Long.parseLong(bid.getBidPrice());
+        if (current < bidPrice && farmMoney >= bidPrice){
             list.leftPush(key, data);
         }
     }
@@ -140,6 +151,11 @@ public class BidService {
 
                 //현재 시간이 경매 종료 예정 시간 이상일 때
                 if(bidTime <= currentTimeMillis()){
+                    SuccessfulBidDto successfulBidDto = successfulBid(String.valueOf(bidIds));
+                    String lastUser = successfulBidDto.getUsername();
+                    Users users = userRepository.findById(lastUser).orElseThrow(() -> new RuntimeException("사용자가 없습니다!"));
+                    users.payFarmMoney(successfulBidDto.getAmount());
+
                     item.setIsSoldout(true);
                     item.setLastBidPrice(Integer.parseInt(bid.getBidPrice()));
                     item.setBuyer(bid.getUserName());
@@ -152,4 +168,16 @@ public class BidService {
             }
         }
   }
+  public SuccessfulBidDto successfulBid(String key){
+      ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
+      Object data = list.index(key, 0);
+      bid= getInstance().fromJson((String) data, Bid.class);
+      SuccessfulBidDto successfulBidDto = new SuccessfulBidDto();
+      successfulBidDto.setUsername(bid.getUserName());
+      successfulBidDto.setAmount(Long.valueOf(bid.getBidPrice()));
+
+
+      return successfulBidDto;
+  }
+
 }

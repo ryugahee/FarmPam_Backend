@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class MarketValueService {
     @Scheduled(cron = "0 0 6 * * *") // Scheduled to run every day at 6 AM
     public void insertSeasonScheduler() {
         // Get items that are sold out today
-        List<Item> soldItems = itemRepository.findByIsSoldoutTrueAndTime(LocalDate.now().atStartOfDay());
+        List<Item> soldItems = itemRepository.findByIsSoldoutTrueAndTime(LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.of("+09:00")));
 
         // Group sold items by tag name
         Map<String, List<Item>> itemsByTagName = soldItems.stream()
