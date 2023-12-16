@@ -28,8 +28,6 @@ public class ChatController {
     }
 
 
-    // TODO: 응답 이후 vuex의 store에 user.id가 남아있는지 확인 할 것
-    //  남아있다는 가정하에 return 값에 user.id는 담지 않음.
     @PostMapping("/chats")
     public ResponseEntity<Long> createChat(@RequestBody NewChatInfoDTO dto) {
         log.info("{}", dto);
