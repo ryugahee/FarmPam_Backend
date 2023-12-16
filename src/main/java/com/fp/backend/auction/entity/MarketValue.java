@@ -15,4 +15,7 @@ public class MarketValue {
     private int averagePrice;
 
     private Timestamp soldDate;
+
+    public MarketValue(String tagName, int averagePrice, Timestamp soldDate) {
+    }
 }

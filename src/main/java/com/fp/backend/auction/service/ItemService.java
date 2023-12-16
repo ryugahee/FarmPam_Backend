@@ -47,8 +47,6 @@ public class ItemService {
 
     private final EntityManager entityManager;
 
-    private final Gson gson;
-
     private final UserRepository userRepository;
 
 
@@ -61,9 +59,6 @@ public class ItemService {
         Item item = itemFormDto.createItem();
         // 경매 마감 시간 저장
         long updatedTime = itemFormDto.getTime() * 1000 + currentTimeMillis();
-        System.out.println("currentTimeMillis() = " + currentTimeMillis());
-        System.out.println("updatedTime = " + updatedTime);
-
 
         item.setTime(updatedTime);
         item.setIsSoldout(false);
@@ -87,20 +82,12 @@ public class ItemService {
 
         // 태그 등록
         itemTagMapService.saveItemTag(item, itemFormDto.getTagNames());
+        //Redis에 경매 시작시 등록된 정보를
+        // Key:value(게시자, 경매 시작가, 경매 종료시간) 형태로 저장
+        bidService.setBidRegistryInfo(
+                String.valueOf(item.getId()), users.getUsername(),
+                String.valueOf(item.getMinPrice()), updatedTime);
 
-
-        String Id = String.valueOf(item.getId());
-        String userName = (users.getUsername());
-        System.out.println("userName = " + userName);
-        String minPrice = String.valueOf((item.getMinPrice()));
-        System.out.println("minPrice = " + minPrice);
-        BidData bidData = new BidData(userName, minPrice, updatedTime);
-
-        String data = gson.toJson(bidData);
-
-        System.out.println("Register Data = " + data);
-
-        bidService.setBidPush(Id, data);
 
         return item.getId();
     }
