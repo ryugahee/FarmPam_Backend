@@ -51,10 +51,6 @@ public class ChatServiceImpl implements ChatService {
 
         List<ChatPreviewInfoDTO> result = new ArrayList<>();
 
-        // TODO: chatIds를 Chat 도큐먼트에 firstUserId, secondUserId, itemId, lastMessage 찾은 후
-        // TODO: itemId로 경매 물품 타이틀, 경매 이미지 가져오기
-        // TODO: firstUserId와 secondUserId를 자신의 아이디랑 비교 후 상대방 프로필 사진과 닉네임 가져오기
-        // TODO: ChatPriviewDTO 생성
 
         for (Long chatId : chatIds) {
             Chat chat = getChat(chatId);
@@ -139,7 +135,7 @@ public class ChatServiceImpl implements ChatService {
 
                 .itemTitle(item.getItemTitle())
                 .itemThumbnailUrl(itemImg.getImgUrl())
-                .biddingPrice(10000L) // 경매 현재 입찰가
+                .biddingPrice((long) item.getCurrentBidPrice()) // 경매 현재 입찰가
                 .build();
     }
 
