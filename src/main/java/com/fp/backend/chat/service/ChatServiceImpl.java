@@ -132,7 +132,7 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatDetailInfoDTO.builder()
                 .toNickName(receiver.getNickname())
-
+                .bidId(chat.getItemId())
                 .itemTitle(item.getItemTitle())
                 .itemThumbnailUrl(itemImg.getImgUrl())
                 .biddingPrice((long) item.getCurrentBidPrice()) // 경매 현재 입찰가
