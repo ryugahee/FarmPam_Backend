@@ -230,5 +230,8 @@ public class MemberController {
 
     }
 
-
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
+        return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
+    }
 }

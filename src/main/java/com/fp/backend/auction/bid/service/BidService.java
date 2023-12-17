@@ -55,7 +55,9 @@ public class BidService {
 
         long current = Long.parseLong(bid.getBidPrice());
         if (current < bidPrice && farmMoney >= bidPrice){
+            System.out.println(bidPrice);
             list.leftPush(key, data);
+
         }
     }
     @Transactional(readOnly = true)

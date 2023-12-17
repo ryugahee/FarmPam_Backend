@@ -57,6 +57,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         request.getRequestURI().equals("/api/checkNickname") ||
                         request.getRequestURI().equals("/api/compareSMSNumber") ||
                         request.getRequestURI().equals("/login") ||
+                        request.getRequestURI().equals("/api/farmmoney") ||
+                        request.getRequestURI().startsWith("/bid") ||
 
                         request.getRequestURI().equals("/favicon.ico")
 
