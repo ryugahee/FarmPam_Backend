@@ -3,19 +3,27 @@ package com.fp.backend.account.controller;
 import com.fp.backend.account.common.AuthorityName;
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserInfoDto;
 import com.fp.backend.account.dto.UserDto;
+
 import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.HeaderOptionName;
 import com.fp.backend.account.service.UserService;
 import com.fp.backend.account.sms.SmsUtil;
+import com.fp.backend.auction.dto.SMSVerificationDTO;
 import com.fp.backend.system.config.redis.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +55,7 @@ public class MemberController {
 
     //로그인
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginDto dto, HttpServletResponse response) throws IOException {
+    public ResponseEntity<?> login(@RequestBody LoginDto dto, HttpServletResponse response) throws IOException {
 
         System.out.println("로그인 요청 컨트롤러 진입: " + dto.getUsername() + ",  " + dto.getPassword());
 
@@ -61,10 +69,10 @@ public class MemberController {
 
     //로그아웃
     @PostMapping("/userLogout")
-    public void logout(HttpServletResponse response) {
+    public void logout(HttpServletRequest request) {
         System.out.println("로그아웃 요청");
 
-        userService.userLogout(response);
+        userService.userLogout(request);
 
     }
 
@@ -81,7 +89,7 @@ public class MemberController {
 
     //엑세스 토큰이 유효하지 않을 때 리프레시 토큰 요청
     @PostMapping("/requireRefreshToken")
-    public ResponseEntity refresh(HttpServletResponse response) {
+    public ResponseEntity<?> refresh(HttpServletResponse response) {
 
         System.out.println("응답 토큰 확인 : " + response.getHeader("accessToken"));
 
@@ -96,13 +104,35 @@ public class MemberController {
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
+
+    //간편 로그인 유저 추가 정보 입력
+    @PostMapping("/additionalInfo")
+    public ResponseEntity<?> additionalRegister(@RequestBody SignupDto dto, HttpServletRequest request) {
+
+        System.out.println("간편 로그인 유저 추가 정보 입력 컨트롤러 진입");
+
+        String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+
+        return userService.addtionalRegister(dto, accessToken);
+
+//        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
     //휴대폰 인증 번호 요청
     @PostMapping("/checkPhoneNumber")
-    public String phoneCheck(@RequestBody String phoneNumber) {
+    public String phoneCheck(@RequestBody String phoneNumber, HttpServletRequest request) {
 
-        System.out.println("휴대폰 번호 인증 컨트롤러 작동");
+        System.out.println("휴대폰 인증번호 발송 컨트롤러 작동 : " + phoneNumber);
 
-        userService.userPhoneCheck(phoneNumber);
+        phoneNumber = phoneNumber.replace("\"", "");
+
+        String usernameBefore = request.getHeader("username");
+
+        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
+        String username = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        userService.userPhoneCheck(phoneNumber, username);
 
         return "";
 
@@ -110,9 +140,11 @@ public class MemberController {
 
     //인증 번호 확인
     @PostMapping("/compareSMSNumber")
-    public ResponseEntity smsNumberCheck(@RequestBody String smsNumber, @RequestBody String phoneNumber) {
+    public ResponseEntity<?> smsNumberCheck(@RequestBody SMSVerificationDTO dto) {
 
-        String result = userService.compareSMSCode(smsNumber, phoneNumber);
+        System.out.println("문자 인증 번호 비교 smsNumberCheck 컨트롤러 진입");
+
+        String result = userService.compareSMSCode(dto.getSmsNumber(), dto.getPhoneNumber());
 
         if (result.isEmpty()) {
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -125,7 +157,7 @@ public class MemberController {
 
     //멤버 현황
     @GetMapping("/getAllUsers")
-    public ResponseEntity getAllMember() {
+    public ResponseEntity<?> getAllMember() {
 
         List<Users> allUsers = userService.getAllUser();
 
@@ -134,9 +166,42 @@ public class MemberController {
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
-        return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
+
+    //유저 정보 불러오기
+    @PostMapping("/getUserInfo")
+    public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
+
+        System.out.println("유저 정보 불러오기 컨트롤러 진입");
+
+        String usernameBefore = request.getHeader("username");
+
+        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
+        String username = new String(decodedBytes, StandardCharsets.UTF_8);
+
+       Users user = userService.getUserInfo(username);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    //유저 정보 수정
+    @PostMapping("/updateUserInfo")
+    public ResponseEntity<?> updateUserInfo(
+            @Valid UserInfoDto dto,
+          HttpServletRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile imgFile
+    ) throws Exception {
+
+        System.out.println("유저 수정 컨트롤러 진입");
+        System.out.println("들어온 유저 수정 데이터 확인: " + dto.toString());
+
+//        if (imgFile != null) {
+            System.out.println("이미지 파일 정보: " + imgFile.getOriginalFilename());
+            // 이미지 파일이 전송된 경우 처리할 내용
+//        }
+        userService.updateUserInfo(dto, request, imgFile);
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

@@ -43,9 +43,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             List<Authorities> userAuth = authoritiesRepository.findByUsername(oAuth2User.getUsername());
 
             if (userAuth.get(0).getAuthority().equals(AuthorityName.GUEST.getKey())) {
-                response.sendRedirect("http://localhost:3000/additionalInfo");
+                response.sendRedirect("http://localhost:8081/easyLogin");
             } else {
-                response.sendRedirect("http://localhost:3000");
+                response.sendRedirect("http://localhost:8081/");
             }
 
         } catch (Exception e) {

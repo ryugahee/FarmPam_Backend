@@ -6,11 +6,8 @@ import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.entity.Item;
-import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.farmmoney.dto.SuccessfulBidDto;
-import com.fp.backend.farmmoney.service.FarmService;
-import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +57,19 @@ public class BidService {
         if (current < bidPrice && farmMoney >= bidPrice){
             list.leftPush(key, data);
         }
+    }
+    @Transactional(readOnly = true)
+    public List<BidVO> getMyBidPrice(String key, String userName){
+        List<BidVO> allBidList = getValuesListAll(key);
+        List<BidVO> myBidList = new ArrayList<>();
+        for(int i = 0; allBidList.size() <= i; i++){
+            BidVO bidVO = allBidList.get(i);
+            String BidListName = bidVO.getUserName();
+            if(BidListName.equals(userName)){
+                myBidList.add(bidVO);
+            }
+        }
+        return myBidList;
     }
 
     public String getValuesLastIndex(String key){
@@ -122,6 +132,10 @@ public class BidService {
         return allCurrentBid;
     }
 
+//    public Object myBidPrice(String key, Object data){
+//
+//    }
+
     @Scheduled(cron = "0 0 6 * * *")
     public void insertSeasonScheduler() {
 
@@ -136,6 +150,7 @@ public class BidService {
         //모든 Keys * 값 호출
         Set<String> keys = redisTemplate_Bid.keys("*");
         if (keys != null) {
+
 
             for(String key : keys){
                 int index = key.indexOf(":");
