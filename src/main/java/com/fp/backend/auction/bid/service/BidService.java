@@ -6,11 +6,8 @@ import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidData;
 import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.entity.Item;
-import com.fp.backend.auction.entity.MarketValue;
 import com.fp.backend.auction.repository.ItemRepository;
 import com.fp.backend.farmmoney.dto.SuccessfulBidDto;
-import com.fp.backend.farmmoney.service.FarmService;
-import com.fp.backend.system.config.websocket.SocketVO;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +55,9 @@ public class BidService {
 
         long current = Long.parseLong(bid.getBidPrice());
         if (current < bidPrice && farmMoney >= bidPrice){
+            System.out.println(bidPrice);
             list.leftPush(key, data);
+
         }
     }
     @Transactional(readOnly = true)

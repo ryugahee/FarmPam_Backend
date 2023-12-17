@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
 
-//    @Qualifier("redisTemplate_Bid")
+    @Qualifier("redisTemplate_Token")
     private final RedisTemplate<String, Object> redisTemplate_Token;
 
 

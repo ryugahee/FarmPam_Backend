@@ -350,4 +350,32 @@ public class UserService {
                 .farmMoney(users.getFarmMoney())
                 .build();
     }
+
+    public ResponseEntity<?> checkId(String username) {
+
+        Optional<Users> user = userRepository.findByUsername(username);
+
+        System.out.println("유저가 있는지? : " + user.isPresent());
+
+        if (user.isPresent()) {
+            return new ResponseEntity<>("이미 존재하는 아이디 입니다.", HttpStatus.BAD_REQUEST);
+        }
+        else {
+            return new ResponseEntity<>("사용 가능한 아이디 입니다.", HttpStatus.OK);
+        }
+
+    }
+
+    public ResponseEntity<?> checkNickname(String nickname) {
+        Optional<Users> user = userRepository.findByNickname(nickname);
+
+        System.out.println("유저가 있는지? : " + user.isPresent());
+
+        if (user.isPresent()) {
+            return new ResponseEntity<>("이미 존재하는 닉네임 입니다.", HttpStatus.BAD_REQUEST);
+        }
+        else {
+            return new ResponseEntity<>("사용 가능한 닉네임 입니다.", HttpStatus.OK);
+        }
+    }
 }

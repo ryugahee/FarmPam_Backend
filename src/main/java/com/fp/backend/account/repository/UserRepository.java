@@ -20,6 +20,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     Optional<Users> findByEmail(String email);
 
+    Optional<Users> findByNickname(String nickname);
 
     @EntityGraph(attributePaths = "authorities") // Lazy조회가 아닌 Eager 조회로 authorities 정보를 같이 가져오게 됨
     Optional<Users> findOneWithAuthoritiesByUsername(String username);
