@@ -14,9 +14,7 @@ permissions:
 
 # 수명 주기
 hooks:
-  # install이 끝났을 때
   AfterInstall:
-    # scripts에 deploy.sh라는 쉘 스크립트를 실행 시켜
     - location: scripts/deploy.sh
-      timeout: 60
+      timeout: 180
       runas: ubuntu

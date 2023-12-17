@@ -61,6 +61,7 @@ public class UserImgService {
                 .streetAddress(dto.getStreetAddress())
                 .detailAddress(dto.getDetailAddress())
                 .imageUrl(imgUrl)
+                .farmMoney(dto.getFarmMoney())
                 .build();
 
         userRepository.save(updatedUser);

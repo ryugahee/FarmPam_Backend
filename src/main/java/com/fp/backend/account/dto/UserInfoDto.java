@@ -21,5 +21,6 @@ public class UserInfoDto {
     private String mailCode;
     private String streetAddress;
     private String detailAddress;
+    private Long farmMoney;
 
 }
