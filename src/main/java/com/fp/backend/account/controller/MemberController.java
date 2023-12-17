@@ -202,6 +202,32 @@ public class MemberController {
 
 
         return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+
+    //아이디 중복 체크
+    @PostMapping("/checkUsername")
+    public ResponseEntity<?> checkId(@RequestBody String username) {
+
+        username = username.replace("\"", "");
+
+        System.out.println("유저네임 : " + username);
+
+        return userService.checkId(username);
+
+    }
+
+    //닉네임 중복 체크
+    @PostMapping("/checkNickname")
+    public ResponseEntity<?> checkNickname(@RequestBody String nickname) {
+
+        nickname = nickname.replace("\"", "");
+
+        System.out.println("유저네임 : " + nickname);
+
+        return userService.checkNickname(nickname);
+
     }
 
 
