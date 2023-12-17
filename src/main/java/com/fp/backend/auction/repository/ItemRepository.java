@@ -19,6 +19,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
    //최신
     Slice<Item> findByIsSoldoutFalseOrderByIdDesc(PageRequest pageable);
 
+    //등록순
+    Slice<Item> findByIsSoldoutFalseOrderByIdAsc(PageRequest pageable);
 
     //경매상태 업데이트
     List<Item> findByTimeLessThan(long currentTimeMillis);

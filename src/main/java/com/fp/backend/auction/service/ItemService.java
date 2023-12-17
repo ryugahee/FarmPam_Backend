@@ -121,6 +121,10 @@ public class ItemService {
                 PageRequest pageable = PageRequest.of(page, 7);
                 itemList = this.itemRepository.findCompletedItemsOrderedByIdAsc(pageable);
 
+            } else if (sortType.equals("home")) {
+                PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdAsc(pageable);
+
             } else {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("id").descending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByIdDesc(pageable);
@@ -154,11 +158,6 @@ public class ItemService {
                     itemFormDtoList.add(itemFormDto);
                 }
             }
-
-            System.out.println("시간: " + itemFormDto.getTime());
-            System.out.println("판매여부: " + itemFormDto.getIsSoldout());
-
-            System.out.println("낙착자: " + itemFormDto);
 
         }
         return itemFormDtoList;

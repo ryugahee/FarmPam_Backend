@@ -80,7 +80,6 @@ public class ItemController {
         return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
-
     // 경매 삭제
     @DeleteMapping("/item/delete/{itemId}")
     public ResponseEntity<ItemFormDto> deleteItem(@PathVariable("itemId") Long id) {
