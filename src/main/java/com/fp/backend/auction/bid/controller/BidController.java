@@ -1,6 +1,8 @@
 package com.fp.backend.auction.bid.controller;
 
 
+import com.fp.backend.account.entity.Users;
+import com.fp.backend.account.service.UserService;
 import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.bid.service.BidService;
@@ -23,10 +25,16 @@ import java.util.List;
 public class BidController {
 
     private final BidService bidService;
+    private final UserService userService;
 
+    @PostMapping("/publisherInfo")
+    public String bidPublisher(@RequestBody SocketVO socketVO){
+        System.out.println("userName = " + socketVO.getBidId());
 
-
-
+        Users users = userService.getUserInfo(socketVO.getBidId());
+        System.out.println("users.getNickname() = " + users.getNickname());
+        return users.getNickname();
+    }
     @PostMapping("/bid-list")
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
@@ -35,11 +43,14 @@ public class BidController {
         return bidService.getValuesListAll(bidId);
 
     }
-    @PostMapping("/bid-myPrice/{itemId}")
-    public List<BidVO> MyBidPrice(@PathVariable("itemId") Long id, String userName){
-        System.out.println(id);
-        System.out.println(userName);
-        return bidService.getMyBidPrice(String.valueOf(id), userName);
+    @PostMapping("/bid-myPrice")
+    public List<BidVO> MyBidPrice( @RequestBody SocketVO socketVO){
+        System.out.println("여기 존나 여기: "+socketVO.getBidId());
+        System.out.println("여기 존나 여기 2: "+socketVO.getContent());
+        List<BidVO> data = bidService.getMyBidPrice(socketVO.getBidId(), (String) socketVO.getContent());
+        System.out.println("존나존나 여기인듯한여기: "+ data.get(0));
+
+        return data;
     }
 
 
@@ -49,7 +60,7 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
-    @GetMapping("/bidPost")
+    @GetMapping("/bid-Post")
     public Object bidPostResponse(){
         return bidService.currentBid();
     }

@@ -82,7 +82,8 @@ public class SecurityConfig {
 //                                        new AntPathRequestMatcher("/api/item/marketValue"),
                                         new AntPathRequestMatcher("/api/farmmoney"),
                                         new AntPathRequestMatcher("/favicon.ico"),
-                                        new AntPathRequestMatcher("/bid/**")
+                                        new AntPathRequestMatcher("/bid/**"),
+                                        new AntPathRequestMatcher("/chat/**")
 
                                 ).permitAll()
                                 .anyRequest().authenticated()
