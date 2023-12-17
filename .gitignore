@@ -41,7 +41,6 @@ application-mysql.properties
 ### VS Code ###
 .vscode/
 
-/src/main/resources/application-oauth.yml
 ### AWS ###
 src/main/resources/aws.yml
 src/main/resources/application-oauth.yml
