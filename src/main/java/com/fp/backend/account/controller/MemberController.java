@@ -202,6 +202,7 @@ public class MemberController {
 
 
         return new ResponseEntity<>(HttpStatus.OK);
+
     }
 
 
@@ -229,6 +230,7 @@ public class MemberController {
 
     }
 
+
     //아이디 찾기
     @PostMapping("/findUsername")
     public ResponseEntity<?> findUsername(@RequestBody String phoneNumber) {
@@ -237,5 +239,11 @@ public class MemberController {
 
     }
 
+
+
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
+        return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
+    }
 
 }

@@ -45,6 +45,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             if (userAuth.get(0).getAuthority().equals(AuthorityName.GUEST.getKey())) {
                 response.sendRedirect("http://localhost:8081/easyLogin");
             } else {
+
                 response.sendRedirect("http://localhost:8081/login");
             }
 

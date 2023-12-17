@@ -14,8 +14,8 @@ public class FarmService {
 
     private final UserRepository userRepository;
 
-    public Long getFarmMoney(String username) {
-        Users user = getUser(username);
+    public Long getFarmMoney(String userId) {
+        Users user = getUser(userId);
 
         return user.getFarmMoney();
     }

@@ -1,6 +1,8 @@
 package com.fp.backend.auction.bid.controller;
 
 
+import com.fp.backend.account.entity.Users;
+import com.fp.backend.account.service.UserService;
 import com.fp.backend.auction.bid.dto.Bid;
 import com.fp.backend.auction.bid.dto.BidVO;
 import com.fp.backend.auction.bid.service.BidService;
@@ -23,10 +25,16 @@ import java.util.List;
 public class BidController {
 
     private final BidService bidService;
+    private final UserService userService;
 
+    @PostMapping("/publisherInfo")
+    public String bidPublisher(@RequestBody SocketVO socketVO){
+        System.out.println("userName = " + socketVO.getBidId());
 
-
-
+        Users users = userService.getUserInfo(socketVO.getBidId());
+        System.out.println("users.getNickname() = " + users.getNickname());
+        return users.getNickname();
+    }
     @PostMapping("/bid-list")
     @SendTo("/bidList")
     public Object bidList(@RequestBody SocketVO socketVO){
@@ -60,6 +68,7 @@ public class BidController {
         String bidId = socketVO.getBidId();
         Object content = socketVO.getContent();
         bidService.setValuesPush(bidId, content);
+
         return bidService.getValuesListAll(bidId);
     }
 //    @MessageMapping("/bid-myPrice")
