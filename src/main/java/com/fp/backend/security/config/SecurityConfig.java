@@ -80,7 +80,9 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/compareSMSNumber"),
 //                                        new AntPathRequestMatcher("/api/item/allMarketValues"),
 //                                        new AntPathRequestMatcher("/api/item/marketValue"),
-                                        new AntPathRequestMatcher("/favicon.ico")
+                                        new AntPathRequestMatcher("/api/farmmoney"),
+                                        new AntPathRequestMatcher("/favicon.ico"),
+                                        new AntPathRequestMatcher("/bid/**")
 
                                 ).permitAll()
                                 .anyRequest().authenticated()

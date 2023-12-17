@@ -60,6 +60,7 @@ public class BidController {
         String bidId = socketVO.getBidId();
         Object content = socketVO.getContent();
         bidService.setValuesPush(bidId, content);
+
         return bidService.getValuesListAll(bidId);
     }
 //    @MessageMapping("/bid-myPrice")
