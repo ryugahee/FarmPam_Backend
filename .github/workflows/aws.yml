@@ -57,7 +57,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Print AWS Credentials File
-        run: cat $HOME/.aws/credentials
+        run: cat $HOME/.aws
 
       # S3로 업로드
       - name: Upload to S3
