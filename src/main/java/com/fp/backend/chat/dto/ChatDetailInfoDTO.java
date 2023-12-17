@@ -15,4 +15,5 @@ public class ChatDetailInfoDTO {
     private String itemTitle;
     private String itemThumbnailUrl;
     private Long biddingPrice;
+    private Long bidId;
 }

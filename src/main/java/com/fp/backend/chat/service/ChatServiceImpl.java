@@ -128,7 +128,7 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatDetailInfoDTO.builder()
                 .toNickName(receiver.getNickname())
-
+                .bidId(chat.getItemId())
                 .itemTitle(item.getItemTitle())
                 .itemThumbnailUrl(itemImg.getImgUrl())
                 .biddingPrice((long) ((long) item.getCurrentBidPrice() == 0 ? item.getMinPrice() : item.getCurrentBidPrice()))
