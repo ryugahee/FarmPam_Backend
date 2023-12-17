@@ -18,10 +18,10 @@ public class FarmMoneyController {
     private final FarmService farmService;
 
     @GetMapping("/farmmoney")
-    public ResponseEntity<Long> getFarmMoney(@RequestParam String username) {
+    public ResponseEntity<Long> getFarmMoney(@RequestParam String userId) {
 
-        log.info("{}의 getFarmMoney", username);
-        Long farmMoney = farmService.getFarmMoney(username);
+        log.info("{}의 getFarmMoney", userId);
+        Long farmMoney = farmService.getFarmMoney(userId);
         return new ResponseEntity<>(farmMoney, HttpStatus.OK);
     }
 
