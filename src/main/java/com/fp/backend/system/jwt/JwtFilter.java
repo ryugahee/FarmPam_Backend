@@ -4,6 +4,7 @@ import com.fp.backend.account.entity.Users;
 import com.fp.backend.account.enums.ApiName;
 import com.fp.backend.account.enums.HeaderOptionName;
 import com.fp.backend.account.enums.MessageName;
+import com.fp.backend.account.repository.AuthoritiesRepository;
 import com.fp.backend.system.config.redis.RedisService;
 import com.fp.backend.system.util.PasswordUtil;
 import jakarta.servlet.FilterChain;
@@ -20,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -27,11 +30,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final RedisService redisUserService;
 
+    private final AuthoritiesRepository authoritiesRepository;
+
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
-    public JwtFilter(TokenProvider tokenProvider, RedisService redisUserService) {
+    public JwtFilter(TokenProvider tokenProvider, RedisService redisUserService, AuthoritiesRepository authoritiesRepository) {
         this.tokenProvider = tokenProvider;
         this.redisUserService = redisUserService;
+        this.authoritiesRepository = authoritiesRepository;
     }
 
     @Override
@@ -46,6 +52,14 @@ public class JwtFilter extends OncePerRequestFilter {
                         request.getRequestURI().equals(ApiName.SIGNUP.getKey()) ||
                         request.getRequestURI().equals(ApiName.LOGOUT.getKey()) ||
                         request.getRequestURI().equals("/api/checkPhoneNumber") ||
+
+                        request.getRequestURI().equals("/api/checkUsername") ||
+                        request.getRequestURI().equals("/api/checkNickname") ||
+                        request.getRequestURI().equals("/api/compareSMSNumber") ||
+                        request.getRequestURI().equals("/login") ||
+                        request.getRequestURI().equals("/api/farmmoney") ||
+                        request.getRequestURI().startsWith("/bid") ||
+
                         request.getRequestURI().equals("/favicon.ico")
 
         ) {
@@ -54,6 +68,22 @@ public class JwtFilter extends OncePerRequestFilter {
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
 
+
+        if ( //관리자 페이지의 요청이 들어왔다면
+                request.getRequestURI().equals("/api/item/marketValue") ||
+                request.getRequestURI().equals("/api/item/allMarketValues") ||
+                request.getRequestURI().equals("/api/getAllUsers") ||
+                request.getRequestURI().equals("/api/additionalInfo")
+
+        ) {
+
+            //레디스에서 엑세스토큰(키)으로 유저네임 찾기
+
+
+        }
+
+
+
         //엑세스 토큰 추출
         String accessToken = tokenProvider
                 .extractAccessToken(request)
@@ -61,13 +91,34 @@ public class JwtFilter extends OncePerRequestFilter {
 
         System.out.println("엑세스 토큰 : " + accessToken);
 
+        System.out.println("유저 이름 : " + request.getHeader("username"));
+
+        String usernameBefore = request.getHeader("username");
+
+        byte[] decodedBytes = Base64.getDecoder().decode(usernameBefore);
+        String username = new String(decodedBytes, StandardCharsets.UTF_8);
+
+        System.out.println("디코딩한 유저네임 : " + username);
+
+        username = username.replace("\"", "");
+
+        Users user = Users.builder()
+                .username(username)
+                .password(PasswordUtil.generateRandomPassword())
+                .build();
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(user, null,
+                        authoritiesMapper.mapAuthorities(user.getAuthorities()));
+
+
         //헤더에 엑세스 토큰이 있다면
         if (accessToken != null) {
             //액세스 토큰에 대한 판단
             ResponseEntity accessTokenResponseEntity = decideAccessTokenPath(accessToken);
 
-            //TODO: 중복 로그인 검증. 레디스에서 해당 유저 네임의 엑세스 토큰이 일치하는지 확인
-            boolean result = redisUserService.accessTokenFind(accessToken, request.getHeader("username"));
+            //중복 로그인 검증. 레디스에서 해당 엑세스 토큰이 일치하는지 확인
+            boolean result = redisUserService.accessTokenCompare(username);
 
 
             if (accessTokenResponseEntity != null) {
@@ -90,6 +141,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 return; // 메시지를 보낸 후에는 이후 로직을 실행하지 않고 종료
             }
 
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+            return;
         } // 엑세스 토큰이 없다면 아래 계속 진행
 
 
@@ -108,9 +162,6 @@ public class JwtFilter extends OncePerRequestFilter {
          *엑세스 토큰 재발급(덮어쓰기) 및 리프레시 토큰을 갱신해야 함
          * */
 
-        //헤더에서 유저네임 꺼내기
-        String username = request.getHeader("username");
-
         //새 엑세스 토큰 생성
         String newAccessToken = tokenProvider.createAccessToken();
 
@@ -126,14 +177,7 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setHeader(HeaderOptionName.ACCESSTOKEN.getKey(), newAccessToken);
         response.setHeader(HeaderOptionName.REFRESHTOKEN.getKey(), newRefreshToken);
 
-        Users user = Users.builder()
-                .username(username)
-                .password(PasswordUtil.generateRandomPassword())
-                .build();
 
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(user, null,
-                        authoritiesMapper.mapAuthorities(user.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
