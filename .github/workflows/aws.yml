@@ -42,6 +42,10 @@ jobs:
       - name: Make jar File
         run: gradle bootJar
 
+      # jar 파일로 압축
+      - name: cvf jar
+        run: jar cvf backend-0.0.1-SNAPSHOT.jar
+
       # 압축 파일 생성
       - name: Make Zip File
         run: zip -qq -r ./backend.zip .
