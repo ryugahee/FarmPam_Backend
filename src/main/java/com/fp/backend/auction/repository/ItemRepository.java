@@ -2,7 +2,9 @@ package com.fp.backend.auction.repository;
 
 import com.fp.backend.auction.entity.Item;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -49,6 +51,16 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
     List<Item> findByIsSoldoutTrueAndTime(long localDateTime);
+
+
+ Page<Item> findByIsSoldoutTrue(Pageable page);
+ Page<Item> findByIsSoldoutFalse(Pageable page);
+
+
+ Page<Item> findAllByIsSoldoutTrue(Pageable pageable);
+
+ Page<Item> findAllByIsSoldoutFalse(Pageable pageable);
+
 }
 
 

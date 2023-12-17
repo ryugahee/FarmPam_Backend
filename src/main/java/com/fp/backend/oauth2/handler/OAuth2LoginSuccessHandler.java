@@ -42,7 +42,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             //간편 로그인 후 추가 정보를 입력하지 않았다면(ROLE이 GUEST라면) 추가 정보 입력 페이지로 리다이렉트
             List<Authorities> userAuth = authoritiesRepository.findByUsername(oAuth2User.getUsername());
 
+            System.out.println("간편로그인 유저 권한 확인 : " + userAuth.get(0).getAuthority().equals(AuthorityName.GUEST.getKey()));
+
             if (userAuth.get(0).getAuthority().equals(AuthorityName.GUEST.getKey())) {
+                System.out.println("추가 정보 입력 페이지로");
                 response.sendRedirect("http://localhost:8081/easyLogin");
             } else {
 
