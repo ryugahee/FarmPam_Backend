@@ -12,7 +12,7 @@ env:
   # CodeDeploy의 앱 이름
   CODE_DEPLOY_APP_NAME: FarmPam-CodeDeploy-App
   # CodeDeploy의 배포 그룹 이름
-  DEPLOYMENT_GROUP_NAME: Test
+  DEPLOYMENT_GROUP_NAME: FarmPam-CodeDeploy-Group
 
 jobs:
   build:
