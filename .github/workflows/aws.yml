@@ -12,7 +12,7 @@ env:
   # CodeDeploy의 앱 이름
   CODE_DEPLOY_APP_NAME: FarmPam-CodeDeploy-App
   # CodeDeploy의 배포 그룹 이름
-  DEPLOYMENT_GROUP_NAME: Test
+  DEPLOYMENT_GROUP_NAME: FarmPam-CodeDeploy-Group
 
 jobs:
   build:
@@ -42,6 +42,10 @@ jobs:
       - name: Make jar File
         run: gradle bootJar
 
+      # jar 파일로 압축
+      - name: cvf jar
+        run: jar cvf backend-0.0.1-SNAPSHOT.jar
+
       # 압축 파일 생성
       - name: Make Zip File
         run: zip -qq -r ./backend.zip .
@@ -51,9 +55,10 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-region: us-west-2
+          audience: sts.amazonaws.com
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
 
       # S3로 업로드
       - name: Upload to S3
