@@ -229,5 +229,13 @@ public class MemberController {
 
     }
 
+    //아이디 찾기
+    @PostMapping("/findUsername")
+    public ResponseEntity<?> findUsername(@RequestBody String phoneNumber) {
+
+       return userService.findUsername(phoneNumber);
+
+    }
+
 
 }

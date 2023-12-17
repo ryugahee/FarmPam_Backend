@@ -60,6 +60,11 @@ public class UserService {
                     .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                     .email(dto.getEmail())
                     .nickname(dto.getNickname())
+                    .realName(dto.getRealName())
+                    .mailCode(dto.getMailCode())
+                    .streetAddress(dto.getStreetAddress())
+                    .detailAddress(dto.getDetailAddress())
+                    .phoneNumber(dto.getPhoneNumber())
                     .enabled(true)
                     .farmMoney(0L)
                     .build();
@@ -378,5 +383,12 @@ public class UserService {
         else {
             return new ResponseEntity<>("사용 가능한 닉네임 입니다.", HttpStatus.OK);
         }
+    }
+
+    public ResponseEntity<?> findUsername(String phoneNumber) {
+
+      Users user = userRepository.findByPhoneNumber(phoneNumber);
+
+        return new ResponseEntity<>(user.getUsername(), HttpStatus.OK);
     }
 }
