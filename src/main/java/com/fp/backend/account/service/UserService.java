@@ -345,8 +345,7 @@ public class UserService {
         return UserDto.builder()
                 .name(users.getRealName())
                 .email(users.getEmail())
-                // TODO: users.getPhoneNumber() 로 돌릴 것
-                .phoneNumber("01000000000")
+                .phoneNumber(users.getPhoneNumber())
                 .nickname(users.getNickname())
                 .farmMoney(users.getFarmMoney())
                 .build();
