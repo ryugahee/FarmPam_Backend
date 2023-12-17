@@ -158,6 +158,22 @@ public class ItemService {
         return itemFormDtoList;
     }
 
+
+    @Transactional(readOnly = true)
+    public Page<Item> getAllItems(int page, String sortType) {
+
+        PageRequest pageable = PageRequest.of(page, 9);
+
+//        return itemRepository.findAll(pageable);
+
+        if (sortType.equals("completed")) {
+            return itemRepository.findAllByIsSoldoutTrue(pageable);
+        }
+        else {
+            return itemRepository.findAllByIsSoldoutFalse(pageable);
+        }
+    }
+
     //네브바 검색
     @Transactional(readOnly = true)
     public List<ItemFormDto> getItemList(int page, String keyword) {
