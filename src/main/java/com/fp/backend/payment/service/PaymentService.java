@@ -23,7 +23,7 @@ public interface PaymentService {
                 .orderName(paymentInfo.getOrderName())
                 .orderId(paymentInfo.getOrderId())
                 .paymentKey(paymentInfo.getPaymentKey())
-                .provider(paymentInfo.getEasyPay().getProvider())
+                .provider(paymentInfo.getMethod().equals("간편결제") ? paymentInfo.getEasyPay().getProvider() : null)
                 .failureMessage(paymentInfo.getPayFailure() == null ? null : paymentInfo.getPayFailure().getMessage())
                 .users(user)
                 .build();
