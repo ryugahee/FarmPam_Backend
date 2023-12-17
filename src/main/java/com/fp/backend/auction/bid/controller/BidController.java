@@ -43,11 +43,14 @@ public class BidController {
         return bidService.getValuesListAll(bidId);
 
     }
-    @PostMapping("/bid-myPrice/{itemId}")
-    public List<BidVO> MyBidPrice(@PathVariable("itemId") Long id, String userName){
-        System.out.println(id);
-        System.out.println(userName);
-        return bidService.getMyBidPrice(String.valueOf(id), userName);
+    @PostMapping("/bid-myPrice")
+    public List<BidVO> MyBidPrice( @RequestBody SocketVO socketVO){
+        System.out.println("여기 존나 여기: "+socketVO.getBidId());
+        System.out.println("여기 존나 여기 2: "+socketVO.getContent());
+        List<BidVO> data = bidService.getMyBidPrice(socketVO.getBidId(), (String) socketVO.getContent());
+        System.out.println("존나존나 여기인듯한여기: "+ data.get(0));
+
+        return data;
     }
 
 
@@ -57,7 +60,7 @@ public class BidController {
         System.out.println("lastBid = " + lastBid);
     }
 
-    @GetMapping("/bidPost")
+    @GetMapping("/bid-Post")
     public Object bidPostResponse(){
         return bidService.currentBid();
     }
