@@ -38,10 +38,6 @@ jobs:
         with:
           arguments: build
 
-      # 게시 될 서버 대상, 자체포함하지 않고 게시
-      - name: Publish
-        run: dotnet publish Admin -c Release -r win10-x64 --output ./Release
-
       # jar 파일 생성
       - name: Make jar File
         run: gradle bootJar
