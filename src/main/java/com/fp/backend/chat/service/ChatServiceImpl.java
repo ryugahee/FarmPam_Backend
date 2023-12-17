@@ -115,8 +115,6 @@ public class ChatServiceImpl implements ChatService {
 
         Chat chat = getChat(chatId);
 
-        // TODO: itemId 로 타이틀, 썸네일, 경매 현재가(실시간 성 필요)
-
         String receiverId = getReceiverId(chat, userId);
 
         Users receiver = getUser(receiverId);
@@ -128,14 +126,12 @@ public class ChatServiceImpl implements ChatService {
                 .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("경매 이미지가 존재하지 않습니다."));
 
-        // TODO: 경매 현재 입찰가 구현
-
         return ChatDetailInfoDTO.builder()
                 .toNickName(receiver.getNickname())
 
                 .itemTitle(item.getItemTitle())
                 .itemThumbnailUrl(itemImg.getImgUrl())
-                .biddingPrice((long) item.getCurrentBidPrice()) // 경매 현재 입찰가
+                .biddingPrice((long) ((long) item.getCurrentBidPrice() == 0 ? item.getMinPrice() : item.getCurrentBidPrice()))
                 .build();
     }
 
