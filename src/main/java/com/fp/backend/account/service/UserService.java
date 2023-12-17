@@ -19,6 +19,8 @@ import com.fp.backend.system.jwt.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -60,6 +62,11 @@ public class UserService {
                     .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                     .email(dto.getEmail())
                     .nickname(dto.getNickname())
+                    .realName(dto.getRealName())
+                    .mailCode(dto.getMailCode())
+                    .streetAddress(dto.getStreetAddress())
+                    .detailAddress(dto.getDetailAddress())
+                    .phoneNumber(dto.getPhoneNumber())
                     .enabled(true)
                     .farmMoney(0L)
                     .build();
@@ -259,7 +266,7 @@ public class UserService {
 
         userRepository.save(user); // 입력한 유저 전화번호 저장
 
-//        smsUtil.sendOne(phoneNumber, randomNumber);
+        smsUtil.sendOne(phoneNumber, randomNumber);
     }
 
     //인증번호 확인 비교
@@ -288,9 +295,12 @@ public class UserService {
 
 
     //모든 유저 가져오기
-    public List<Users> getAllUser() {
+    public Page<Users> getAllUser(int pageNum) {
 
-        List<Users> allUsers = userRepository.findAll();
+        PageRequest pageable = PageRequest.of(pageNum, 9);
+
+
+        Page<Users> allUsers = userRepository.findAll(pageable);
 
         return allUsers;
     }
@@ -377,5 +387,12 @@ public class UserService {
         else {
             return new ResponseEntity<>("사용 가능한 닉네임 입니다.", HttpStatus.OK);
         }
+    }
+
+    public ResponseEntity<?> findUsername(String phoneNumber) {
+
+      Users user = userRepository.findByPhoneNumber(phoneNumber);
+
+        return new ResponseEntity<>(user.getUsername(), HttpStatus.OK);
     }
 }

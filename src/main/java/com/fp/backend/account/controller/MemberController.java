@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -157,14 +158,17 @@ public class MemberController {
 
     //멤버 현황
     @GetMapping("/getAllUsers")
-    public ResponseEntity<?> getAllMember() {
+    public ResponseEntity<?> getAllMember(@RequestParam int pageNum) {
 
-        List<Users> allUsers = userService.getAllUser();
+        System.out.println("멤버 현황 컨트롤러 : " + pageNum);
 
-        System.out.println(allUsers);
+        Page<Users> allUsers = userService.getAllUser(pageNum);
+
+        System.out.println(allUsers.getTotalPages());
 
         return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
+
 
 
     //유저 정보 불러오기
@@ -230,8 +234,20 @@ public class MemberController {
 
     }
 
+
+    //아이디 찾기
+    @PostMapping("/findUsername")
+    public ResponseEntity<?> findUsername(@RequestBody String phoneNumber) {
+
+       return userService.findUsername(phoneNumber);
+
+    }
+
+
+
     @GetMapping("/user")
     public ResponseEntity<UserDto> getUser(@RequestParam String username) {
         return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
     }
+
 }
