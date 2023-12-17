@@ -75,6 +75,9 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/api/login"),
                                         new AntPathRequestMatcher("/api/checkPhoneNumber"),
                                         new AntPathRequestMatcher("/api/userLogout"),
+                                        new AntPathRequestMatcher("/api/checkUsername"),
+                                        new AntPathRequestMatcher("/api/checkNickname"),
+                                        new AntPathRequestMatcher("/api/compareSMSNumber"),
 //                                        new AntPathRequestMatcher("/api/item/allMarketValues"),
 //                                        new AntPathRequestMatcher("/api/item/marketValue"),
                                         new AntPathRequestMatcher("/favicon.ico")
