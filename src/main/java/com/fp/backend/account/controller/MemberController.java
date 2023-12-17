@@ -204,5 +204,9 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
+        System.out.println("username = " + username);
+        return new ResponseEntity<>(userService.getUser(username), HttpStatus.OK);
+    }
 }

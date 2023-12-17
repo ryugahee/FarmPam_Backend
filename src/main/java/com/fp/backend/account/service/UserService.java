@@ -4,6 +4,7 @@ import com.fp.backend.account.common.AuthorityName;
 
 import com.fp.backend.account.dto.LoginDto;
 import com.fp.backend.account.dto.SignupDto;
+import com.fp.backend.account.dto.UserDto;
 import com.fp.backend.account.dto.UserInfoDto;
 
 import com.fp.backend.account.entity.Authorities;
@@ -344,8 +345,7 @@ public class UserService {
         return UserDto.builder()
                 .name(users.getRealName())
                 .email(users.getEmail())
-                // TODO: users.getPhoneNumber() 로 돌릴 것
-                .phoneNumber("01000000000")
+                .phoneNumber(users.getPhoneNumber())
                 .nickname(users.getNickname())
                 .farmMoney(users.getFarmMoney())
                 .build();
