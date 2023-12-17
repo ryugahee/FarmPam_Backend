@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -43,12 +44,15 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Slice<Item> findByKeywordAndTime(@Param("keyword") String keyword, PageRequest pageable);
 
     //경매 완료
-//    Slice<Item> findByIsSoldoutTrueOrderByIdAsc(PageRequest pageable);
     @Query("SELECT i FROM Item i WHERE i.isSoldout = true ORDER BY i.id ASC")
     Slice<Item> findCompletedItemsOrderedByIdAsc(PageRequest pageable);
 
+    //낙찰 목록
+    Slice<Item> findByBuyerIsNotNull(PageRequest pageable);
+
 
     List<Item> findByIsSoldoutTrueAndTime(long localDateTime);
+
 }
 
 

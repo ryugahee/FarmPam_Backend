@@ -151,6 +151,8 @@ public class BidService {
         ListOperations<String, Object> list = redisTemplate_Bid.opsForList();
         //모든 Keys * 값 호출
         Set<String> keys = redisTemplate_Bid.keys("*");
+
+        System.out.println("======================================");
         if (keys != null) {
 
 
@@ -172,11 +174,13 @@ public class BidService {
                     String lastUser = successfulBidDto.getUsername();
                     Users users = userRepository.findById(lastUser).orElseThrow(() -> new RuntimeException("사용자가 없습니다!"));
                     users.payFarmMoney(successfulBidDto.getAmount());
-
                     item.setIsSoldout(true);
+                    System.out.println("user==================================s = " + item.getIsSoldout());
                     item.setLastBidPrice(Integer.parseInt(bid.getBidPrice()));
                     item.setBuyer(bid.getUserName());
                     itemRepository.save(item);
+
+
                     redisTemplate_Bid.delete(String.valueOf(bidIds));
                 }else {
                     item.setCurrentBidPrice(Integer.parseInt(bid.getBidPrice()));

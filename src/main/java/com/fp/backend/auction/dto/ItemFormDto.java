@@ -38,6 +38,10 @@ public class ItemFormDto {
 
     private String userId;
 
+    private String buyer;
+
+    private int lastBidPrice;
+
     private static ModelMapper modelMapper = new ModelMapper();
 
     public Item createItem() {
@@ -56,6 +60,8 @@ public class ItemFormDto {
         }
 
         itemFormDto.setUserId(item.getUsers().getUsername());
+        itemFormDto.setBuyer(item.getBuyer() != null ? item.getBuyer() : null);
+        itemFormDto.setLastBidPrice(item.getLastBidPrice());
 
         return itemFormDto;
 

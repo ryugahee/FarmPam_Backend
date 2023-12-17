@@ -1,9 +1,8 @@
 package com.fp.backend.account.entity;
 
 import com.fp.backend.account.common.AuthorityName;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.fp.backend.auction.entity.Item;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -50,7 +49,6 @@ public class Users implements UserDetails, OAuth2User {
     private String imageUrl;
 
     private Long farmMoney;
-
 
     @Override
     public <A> A getAttribute(String name) {

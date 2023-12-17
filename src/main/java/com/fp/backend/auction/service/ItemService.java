@@ -113,10 +113,11 @@ public class ItemService {
             if (sortType.equals("time")) {
                 PageRequest pageable = PageRequest.of(page, 7, Sort.by("time").ascending());
                 itemList = this.itemRepository.findByIsSoldoutFalseOrderByTime(pageable);
-            } /*else if (sortType.equals("auctioning")) {
+            } else if (sortType.equals("buyer")) {
                 PageRequest pageable = PageRequest.of(page, 7);
+                itemList = this.itemRepository.findByBuyerIsNotNull(pageable);
 
-            } */else if (sortType.equals("completed")) {
+            } else if (sortType.equals("completed")) {
                 PageRequest pageable = PageRequest.of(page, 7);
                 itemList = this.itemRepository.findCompletedItemsOrderedByIdAsc(pageable);
 
@@ -144,6 +145,10 @@ public class ItemService {
                 if (itemFormDto.getIsSoldout()) {
                     itemFormDtoList.add(itemFormDto);
                 }
+            } else if (sortType.equals("buyer")) {
+                if (itemFormDto.getIsSoldout()) {
+                    itemFormDtoList.add(itemFormDto);
+                }
             } else {
                 if (!itemFormDto.getIsSoldout()) {
                     itemFormDtoList.add(itemFormDto);
@@ -153,6 +158,7 @@ public class ItemService {
             System.out.println("시간: " + itemFormDto.getTime());
             System.out.println("판매여부: " + itemFormDto.getIsSoldout());
 
+            System.out.println("낙착자: " + itemFormDto);
 
         }
         return itemFormDtoList;
